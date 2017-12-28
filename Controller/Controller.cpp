@@ -6,18 +6,18 @@
 
 LiquidCrystal lcd(12, 11, 5,4,3,2);
 
-RF24 radio(7,8);
-const byte rxAddr[6] = "00001";
+//RF24 radio(7,8);
+//const byte rxAddr[6] = "00001";
 
 void setup() {
 	lcd.begin(16,2);
 	Serial.begin(115200);
 
-	while (!Serial);
-	Serial.begin(9600);
-	radio.begin();
-	radio.openReadingPipe(0, rxAddr);
-	radio.startListening();
+//	while (!Serial);
+//	Serial.begin(9600);
+//	radio.begin();
+//	radio.openReadingPipe(0, rxAddr);
+//	radio.startListening();
 }
 
 void loop() {
@@ -34,10 +34,10 @@ void loop() {
 	delay(1000);
 	lcd.clear();
 
-	if (radio.available())
-	{
-		char text[32] = {0};
-		radio.read(&text, sizeof(text));
-		Serial.println(text);
-	}
+//	if (radio.available())
+//	{
+//		char text[32] = {0};
+//		radio.read(&text, sizeof(text));
+//		Serial.println(text);
+//	}
 }
