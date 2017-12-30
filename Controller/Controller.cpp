@@ -3,7 +3,7 @@
 #include <Sim800L.h>
 
 #include "classes/Thermo.h"
-#include "classes/ButtonsControls.h"
+#include "Keypad/ButtonsControls.h"
 
 constexpr int rs = 7, en = 6, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 constexpr int trPin = 0;

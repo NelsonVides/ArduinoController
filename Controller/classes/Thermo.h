@@ -1,8 +1,7 @@
 /*
  * Thermo.h
- *
  *  Created on: Dec 28, 2017
- *      Author: plZZ0100
+ *      Author: Nelson Vides
  */
 
 #ifndef CLASSES_THERMO_H_
@@ -21,6 +20,7 @@ private:
 	inline float getVoltage();
 	inline int readSensor();
 };
+
 
 Thermo::Thermo(int pin):sensor(pin) {
 	pinMode(pin,INPUT);
@@ -41,5 +41,6 @@ inline float Thermo::getVoltage() {
 inline int Thermo::readSensor() {
 	return analogRead(this->sensor);
 }
+
 
 #endif /* CLASSES_THERMO_H_ */

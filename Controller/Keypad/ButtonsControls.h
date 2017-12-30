@@ -2,6 +2,7 @@
 #define CLASSES_BUTTONSCONTROLS_H_
 
 #include <Arduino.h>
+#include "Bounce.h"
 
 class ButtonsControls {
 
@@ -29,6 +30,7 @@ private:
 ButtonsControls::ButtonsControls(int pin) : _pin(pin)
 {
 	pinMode(pin, INPUT);
+	int n = n_BV(2);
 }
 
 ButtonsControls::~ButtonsControls() {}
@@ -38,10 +40,6 @@ inline void ButtonsControls::updateState()
 	//Serial.println("updating state");
 	int pressLength = 0;
 	while (this->readSensor() == HIGH) {
-
-		//unsigned long currentMillis = millis();
-		//if (currentMillis - previousMillis >= interval) {
-		//}
 		delay(100); //TODO: get rid of this delay
 		pressLength += 100;
 		Serial.println(pressLength);
