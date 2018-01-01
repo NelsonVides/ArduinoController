@@ -21,13 +21,13 @@
  * Bounce.h
  *  Created on: Dec 30, 2017
  *  Forked from: https://github.com/thomasfredericks/Bounce2
- *  	Set to control analog buttons as well.
+ *  	Set to control analog buttons as well, considering the different input values.
  *  	Got rid of portability boilerplate.
  *  Author: Nelson Vides
  */
 
-#ifndef CLASSES_BOUNCE_H_
-#define CLASSES_BOUNCE_H_
+#ifndef KEYPAD_BOUNCE_H
+#define KEYPAD_BOUNCE_H
 
 // Uncomment the following line for "LOCK-OUT" debounce method
 //#define BOUNCE_LOCK_OUT
@@ -37,25 +37,20 @@
 #include <Arduino.h>
 #include <inttypes.h>
 
-constexpr int n_BV(const int n)
-{
+constexpr uint8_t bitLeftShiftOfOne(const uint8_t n){
     return (1 << n);
 }
 
 class Bounce {
 public:
     // Create an instance of the bounce library
-    Bounce(const int pin);
-
-    // Attach to a pin (and also sets initial state)
-    void setPin(const int pin);
+    explicit Bounce(const uint8_t pin);
 
     // Sets the debounce interval
-    void setInterval(uint16_t interval_millis);
+    void setInterval(const uint16_t interval_millis);
 
     // Updates the pin
-    // Returns 1 if the state changed
-    // Returns 0 if the state did not change
+    // Returns true if changed, false if not
     const bool update();
 
     // Returns the updated pin state
@@ -67,38 +62,40 @@ public:
     // Returns the rising pin state
     const bool rose() const;
 
+    // Returns the updated pin state
+    const uint16_t getValue() const;
+
 protected:
-    unsigned long _previous_millis;
-    uint16_t _interval_millis;
     uint8_t _state;
+    uint16_t _value;
+    uint16_t _interval_millis;
     const uint8_t _pin;
+    unsigned long _previous_millis;
 };
 
 
-constexpr int DEBOUNCED_STATE = 0;
-constexpr int UNSTABLE_STATE = 1;
-constexpr int STATE_CHANGED = 3;
 
-Bounce::Bounce(const int pin)
-    : _previous_millis(0)
-    , _interval_millis(10)
-    , _state(0)
-    , _pin(_pin)
-{
-    this->setPin(pin);
-}
 
-void Bounce::setPin(const int pin)
+/* ************************************************ *
+ * *********** IMPLEMENTATION DETAILS ************* *
+ * ************************************************ */
+constexpr uint8_t DEBOUNCED_STATE = 0;
+constexpr uint8_t UNSTABLE_STATE = 1;
+constexpr uint8_t STATE_CHANGED = 3;
+
+Bounce::Bounce(const uint8_t pin)
+    : _value(0), _state(0), _interval_millis(50), _previous_millis(0), _pin(pin)
 {
-    _state = 0;
-    if (analogRead(pin)) {
-        _state = n_BV(DEBOUNCED_STATE) | n_BV(UNSTABLE_STATE);
+    this->_state = 0;
+    if (analogRead(pin))
+    {
+        this->_state = bitLeftShiftOfOne(DEBOUNCED_STATE) | bitLeftShiftOfOne(UNSTABLE_STATE);
     }
-#ifdef BOUNCE_LOCK_OUT
-    this->_previous_millis = 0;
-#else
-    this->_previous_millis = micros();
-#endif
+    #ifdef BOUNCE_LOCK_OUT
+        this->_previous_millis = 0;
+    #else
+        this->_previous_millis = millis();
+    #endif
 }
 
 void Bounce::setInterval(const uint16_t interval_millis)
@@ -109,86 +106,151 @@ void Bounce::setInterval(const uint16_t interval_millis)
 const bool Bounce::update()
 {
 #ifdef BOUNCE_LOCK_OUT
-    this->_state &= ~n_BV(STATE_CHANGED);
+    this->_state &= ~bitLeftShiftOfOne(STATE_CHANGED);
     // Ignore everything if we are locked out
     if (micros() - this->_previous_millis >= this->_interval_millis)
     {
-        bool currentState = digitalRead(this->_pin);
-        if ((bool)(this->_state & n_BV(DEBOUNCED_STATE)) != currentState)
+        this->_value = analogRead(this->_pin);
+        bool currentState = this->_value;
+        if (currentState != (bool)(this->_state & bitLeftShiftOfOne(DEBOUNCED_STATE)))
         {
             this->_previous_millis = micros();
-            this->_state ^= n_BV(DEBOUNCED_STATE);
-            this->_state |= n_BV(STATE_CHANGED);
+            this->_state ^= bitLeftShiftOfOne(DEBOUNCED_STATE);
+            this->_state |= bitLeftShiftOfOne(STATE_CHANGED);
         }
     }
-    return this->_state & n_BV(STATE_CHANGED);
+    return this->_state & bitLeftShiftOfOne(STATE_CHANGED);
 
 #elif defined BOUNCE_WITH_PROMPT_DETECTION
     // Read the state of the switch port into a temporary variable.
-    bool readState = digitalRead(pin);
+    this->_value = analogRead(this->_pin);
+    bool readState = this->_value;
 
     // Clear Changed State Flag - will be reset if we confirm a button state change.
-    this->_state &= ~n_BV(STATE_CHANGED);
+    this->_state &= ~bitLeftShiftOfOne(STATE_CHANGED);
 
-    if ( readState != (bool)(this->_state & n_BV(DEBOUNCED_STATE)))
+    if (readState != (bool)(this->_state & bitLeftShiftOfOne(DEBOUNCED_STATE)))
     {
 		// We have seen a change from the current button state.
-		if ( micros() - this->_previous_millis >= this->_interval_millis )
+		if (micros() - this->_previous_millis >= this->_interval_millis)
 		{
 			// We have passed the time threshold, so a new change of state is allowed.
 			// set the STATE_CHANGED flag and the new DEBOUNCED_STATE.
 			// This will be prompt as long as there has been greater than interval_misllis ms since last change of input.
 			// Otherwise debounced state will not change again until bouncing is stable for the timeout period.
-			this->_state ^= n_BV(DEBOUNCED_STATE);
-			this->_state |= n_BV(STATE_CHANGED);
+			this->_state ^= bitLeftShiftOfOne(DEBOUNCED_STATE);
+			this->_state |= bitLeftShiftOfOne(STATE_CHANGED);
 		}
     }
 
     // If the readState is different from previous readState, reset the debounce timer - as input is still unstable
     // and we want to prevent new button state changes until the previous one has remained stable for the timeout.
-    if ( readState != (bool)(this->_state & n_BV(UNSTABLE_STATE)) )
+    if (readState != (bool)(this->_state & bitLeftShiftOfOne(UNSTABLE_STATE)))
     {
     	// Update Unstable Bit to macth readState
-        this->_state ^= n_BV(UNSTABLE_STATE);
+        this->_state ^= bitLeftShiftOfOne(UNSTABLE_STATE);
         this->_previous_millis = micros();
     }
     // return just the sate changed bit
-    return this->_state & n_BV(STATE_CHANGED);
+    return this->_state & bitLeftShiftOfOne(STATE_CHANGED);
 #else
+    Serial.println("Updating bouncer");
     // Read the state of the switch in a temporary variable.
-    bool currentState = analogRead(this->_pin);
-    this->_state &= ~n_BV(STATE_CHANGED);
+    this->_value = analogRead(this->_pin);
+    bool currentState = this->_value > 50;
+    _state &= ~bitLeftShiftOfOne(STATE_CHANGED); //reset the STATE_CHANGED flag
 
     // If the reading is different from last reading, reset the debounce counter
-    if ( currentState != (bool)(this->_state & n_BV(UNSTABLE_STATE)) ) {
-        this->_previous_millis = micros();
-        this->_state ^= n_BV(UNSTABLE_STATE);
-    } else if ( micros() - this->_previous_millis >= this->_interval_millis ) {
+    if (currentState != (bool)(_state & bitLeftShiftOfOne(UNSTABLE_STATE))) // PRESSED_STATE != UNSTABLE_STATE
+    {
+        _previous_millis = micros();
+        _state ^= bitLeftShiftOfOne(UNSTABLE_STATE); // turn on the UNSTABLE_STATE flag
+    }
+    else if (micros() - _previous_millis >= _interval_millis)
+    {
+        Serial.println("Signal good threshold time");
         // We have passed the threshold time, so the input is now stable
         // If it is different from last state, set the STATE_CHANGED flag
-        if ((bool)(this->_state & n_BV(DEBOUNCED_STATE)) != currentState) {
-            this->_previous_millis = micros();
-            this->_state ^= n_BV(DEBOUNCED_STATE);
-            this->_state |= n_BV(STATE_CHANGED);
+        // we never enter here, which means that
+        //           when pressed, _state ~ xxx1
+        //            not pressed, _state ~ xxx0
+        //             1 !=          xxxx & 0001
+        if (currentState != (bool)(_state & bitLeftShiftOfOne(DEBOUNCED_STATE))) // PRESSED_STATE != DEBOUNCED_STATE
+        {
+            Serial.println("if pressed, then _state~xxx0, else _state~xxx1");
+            _previous_millis = millis();
+            _state ^= bitLeftShiftOfOne(DEBOUNCED_STATE); // XOR 0001
+            _state |= bitLeftShiftOfOne(STATE_CHANGED);   // iOR 1000
+            Serial.println(_state);
         }
     }
-    return this->_state & n_BV(STATE_CHANGED);
+    else
+    {
+
+    }
+    Serial.print("And the state after the update is: "); Serial.println(_state);
+    return _state & bitLeftShiftOfOne(STATE_CHANGED); // AND 1000
+/*
+    // Read the state of the switch in a temporary variable.
+    this->_value = analogRead(this->_pin);
+    bool currentState = this->_value > 50;
+    // _BV(STATE_CHANGED) = 00001000; // ~_BV(STATE_CHANGED)= 11110111;
+    // _state & 11110111 =  00001000 so from zero, _state will turn out to be 0 still
+            if(_state != 0) Serial.println(_state);
+    _state &= ~bitLeftShiftOfOne(STATE_CHANGED);
+            if(_state != 0) Serial.println(_state);
+
+    // If the reading is different from last reading, reset the debounce counter
+    //             1 !=          0000 & 0010
+    if (currentState != (bool)(_state & bitLeftShiftOfOne(UNSTABLE_STATE)))
+    {
+        _previous_millis = millis();
+        _state ^= bitLeftShiftOfOne(UNSTABLE_STATE);
+        // if currentState = false, then cond = not zero, hence _state ~ xx1x
+        // if currentState =  true, then cond =     zero, hence _state ~ xx0x
+        Serial.println("if pressed, then _state~xx0x, else _state~xx1x");
+    }
+    else if (millis() - _previous_millis >= _interval_millis)
+    {
+        Serial.println("Signal good threshold time");
+        // We have passed the threshold time, so the input is now stable
+        // If it is different from last state, set the STATE_CHANGED flag
+        // we never enter here, which means that
+        //           when pressed, _state ~ xxx1
+        //            not pressed, _state ~ xxx0
+        //             1 !=          xxxx & 0001
+        Serial.print("The state at this point is: ");
+        Serial.println(_state);
+        if (currentState != (bool)(_state & bitLeftShiftOfOne(DEBOUNCED_STATE)))
+        {
+            Serial.println("if pressed, then _state~xxx0, else _state~xxx1");
+            _previous_millis = millis();
+            _state ^= bitLeftShiftOfOne(DEBOUNCED_STATE); // XOR 0001
+            _state |= bitLeftShiftOfOne(STATE_CHANGED);   // iOR 1000
+            Serial.println(_state);
+        }
+    }
+    Serial.print("And the state after the update is: "); Serial.println(_state);
+    return _state & bitLeftShiftOfOne(STATE_CHANGED); // AND 1000
+*/
 #endif
 }
 
-const bool Bounce::read() const
-{
-    return this->_state & n_BV(DEBOUNCED_STATE);
+const bool Bounce::read() const { // false if xxx0; returns DEBOUNCED_STATE flag
+    //FIXME: this is always returning false?
+    return (this->_state & bitLeftShiftOfOne(DEBOUNCED_STATE));
 }
 
-const bool Bounce::rose() const
-{
-    return ( this->_state & n_BV(DEBOUNCED_STATE) ) && ( this->_state & n_BV(STATE_CHANGED));
+const bool Bounce::rose() const { // false if x0x0
+    return (this->_state & bitLeftShiftOfOne(DEBOUNCED_STATE)) && (this->_state & bitLeftShiftOfOne(STATE_CHANGED));
 }
 
-const bool Bounce::fell() const
-{
-    return !( this->_state & n_BV(DEBOUNCED_STATE) ) && ( this->_state & n_BV(STATE_CHANGED));
+const bool Bounce::fell() const { // false if x1x1
+    return !rose();
+}
+
+const uint16_t Bounce::getValue() const {
+    return this->_value;
 }
 
 #endif

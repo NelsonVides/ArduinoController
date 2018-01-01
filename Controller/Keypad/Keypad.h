@@ -14,94 +14,85 @@
 #ifndef CLASSES_KEYPAD_H_
 #define CLASSES_KEYPAD_H_
 
-#include "AnalogPushButton.h"
+#include <Arduino.h>
+#include "AnalogPushButtons.h"
+#include "InfoButton.h"
 
 class Keypad {
 public:
 	Keypad(const int pin1, const int pin2, const int pin3, const int pin4);
 	virtual ~Keypad();
-	void updateState();
-	const AnalogPushButton& getButton() const;
+	void updateKeys();
+
+	/// These callbacks must implement an action for each button on each action.
+    void onPress(uint8_t row, ButtonOnPressCallback callback);
+    CallbackAttachedResponse onRelease(uint8_t row, ButtonOnEventCallback callback) const;
+    CallbackAttachedResponse onRelease(uint8_t row, uint16_t, ButtonOnEventCallback callback) const;
+    CallbackAttachedResponse onRelease(uint8_t row, uint16_t, uint16_t, ButtonOnEventCallback callback) const;
+    CallbackAttachedResponse onHold(uint8_t row, uint16_t, ButtonOnEventCallback callback) const;
+    CallbackAttachedResponse onHoldRepeat(uint8_t row, uint16_t, uint16_t, ButtonOnEventRepeatCallback callback) const;
+    bool is(AnalogPushButtons &btn1, AnalogPushButtons &btn2) const;
+    bool isPressed(uint8_t butt) const;
 
 private:
-	AnalogPushButton _button;
 	const int _pin1;
 	const int _pin2;
 	const int _pin3;
 	const int _pin4;
+	AnalogPushButtons _rowFourButtons[4];
 };
 
 
 
 Keypad::Keypad(const int pin1, const int pin2, const int pin3, const int pin4)
-	: _pin1(pin1),
-	  _pin2(pin2),
-	  _pin3(pin3),
-	  _pin4(pin4) {}
+	: _pin1(pin1), _pin2(pin2), _pin3(pin3), _pin4(pin4),
+	  _rowFourButtons({AnalogPushButtons(pin1),
+                       AnalogPushButtons(pin2),
+                       AnalogPushButtons(pin3),
+                       AnalogPushButtons(pin4)
+                     })
+{}
 Keypad::~Keypad() {}
 
-/*
-void set()
+void Keypad::updateKeys()
 {
-	v1 = analogRead(kb1);
-	v2 = analogRead(kb2);
-	v3 = analogRead(kb3);
-	v4 = analogRead(kb4);
-
-	Serial.println(v1);
-//	Serial.println(v2);
-//	Serial.println(v3);
-//	Serial.println(v4);
-
-	if (v1>200) {
-		_state = !_state;
-		Serial.println(_state);
-		digitalWrite(8,_state);
-	}
-
-	delay(800);
-	//Thanks to https://www.youtube.com/watch?v=iXpM-v8MNAE
-	Serial.print("WCISNIETY KLAWISZ: ");
-
-
-	if (v4>100 && v4<300) {
-		Serial.println("1");}
-	if (v4>300 && v4<550) {
-		Serial.println("2");}
-	if (v4>550 && v4<800) {
-		Serial.println("3");}
-	if (v4>960) {
-		Serial.println("4");}
-
-	if (v3>100 && v3<300){
-		Serial.println("5");}
-	if (v3>300 && v3<550){
-		Serial.println("6");}
-	if (v3>550 && v3<800){
-		Serial.println("7");}
-	if (v3>960){
-		Serial.println("8");}
-
-	if (v2>100 && v2<300){
-		Serial.println("9");}
-	if (v2>300 && v2<550){
-		Serial.println("10");}
-	if (v2>550 && v2<800){
-		Serial.println("11");}
-	if (v2>960){
-		Serial.println("12");}
-
-	if (v1>100 && v1<300){
-		Serial.println("13");}
-	if (v1>300 && v1<550){
-		Serial.println("14");}
-	if (v1>550 && v1<800){
-		Serial.println("15");}
-	if (v1>960){
-		Serial.println("16");}
-	Serial.println(" ");
-	Serial.println("----------------------");
+    for (AnalogPushButtons btn : this->_rowFourButtons) {
+        btn.update();
+    }
 }
-*/
+
+
+void Keypad::onPress(uint8_t row, ButtonOnPressCallback callback) {
+    this->_rowFourButtons[row].onPress(callback);
+}
+CallbackAttachedResponse Keypad::onRelease(uint8_t row, ButtonOnEventCallback callback) const {
+    return this->_rowFourButtons[row].onRelease(callback);
+}
+CallbackAttachedResponse Keypad::onRelease(uint8_t row, uint16_t wait, ButtonOnEventCallback callback) const {
+    return this->_rowFourButtons[row].onRelease(wait, callback);
+}
+CallbackAttachedResponse Keypad::onRelease(uint8_t row, uint16_t wait, uint16_t max_wait, ButtonOnEventCallback callback) const {
+    return this->_rowFourButtons[row].onRelease(wait, max_wait, callback);
+}
+CallbackAttachedResponse Keypad::onHold(uint8_t row, uint16_t duration, ButtonOnEventCallback callback) const {
+    return this->_rowFourButtons[row].onHold(duration, callback);
+}
+CallbackAttachedResponse Keypad::onHoldRepeat(uint8_t row, uint16_t duration, uint16_t repeat_every, ButtonOnEventRepeatCallback callback) const {
+    return this->_rowFourButtons[row].onHoldRepeat(duration, repeat_every, callback);
+}
+
+bool Keypad::is(AnalogPushButtons &btn1, AnalogPushButtons &btn2) const
+{
+    return (&btn1 == &btn2) && (btn1.getButtonNumber() == btn2.getButtonNumber());
+}
+
+bool Keypad::isPressed(uint8_t butt) const
+{
+    //Serial.println("checking if pressed");
+    //Serial.println((butt-1) % 4);
+    //Serial.println(this->_rowFourButtons[(butt-1)%4].getButtonNumber());
+    return (this->_rowFourButtons[(butt-1) % 4].getButtonNumber() == butt);
+}
+
 
 #endif /* CLASSES_KEYPAD_H_ */
