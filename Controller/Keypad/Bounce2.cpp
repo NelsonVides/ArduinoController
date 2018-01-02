@@ -16,6 +16,7 @@ Bounce::Bounce()
     : previous_millis(0)
     , interval_millis(10)
     , state(0)
+    , value(0)
     , pin(0)
 {}
 
@@ -33,12 +34,8 @@ void Bounce::attach(int pin) {
 }
 
 void Bounce::attach(int pin, int mode){
-#if defined(ARDUINO_STM_NUCLEO_F103RB) || defined(ARDUINO_GENERIC_STM32F103C)
-    pinMode(pin, (WiringPinMode)mode);
-#else
     pinMode(pin, mode);
-#endif
-  this->attach(pin);
+    this->attach(pin);
 }
 
 void Bounce::interval(uint16_t interval_millis)
@@ -114,17 +111,21 @@ bool Bounce::update()
 #endif
 }
 
-bool Bounce::read()
+bool Bounce::read() const
 {
     return state & SetBouncerFlag(DEBOUNCED_STATE);
 }
 
-bool Bounce::rose()
+bool Bounce::rose() const
 {
     return ( state & SetBouncerFlag(DEBOUNCED_STATE) ) && ( state & SetBouncerFlag(STATE_CHANGED));
 }
 
-bool Bounce::fell()
+bool Bounce::fell() const
 {
-    return !( state & SetBouncerFlag(DEBOUNCED_STATE) ) && ( state & SetBouncerFlag(STATE_CHANGED));
+    return !rose();
+}
+
+uint16_t Bounce::getValue() const {
+    return value;
 }

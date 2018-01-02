@@ -64,21 +64,16 @@ class Bounce
     bool update();
 
     // Returns the updated pin state
-    bool read();
+    bool read() const;
 
     // Returns the falling pin state
-    bool fell();
+    bool fell() const;
 
     // Returns the rising pin state
-    bool rose();
+    bool rose() const;
 
-    // Partial compatibility for programs written with Bounce version 1
-    bool risingEdge() { return rose(); }
-    bool fallingEdge() { return fell(); }
-    Bounce(uint8_t pin, unsigned long interval_millis ) : Bounce() {
-        attach(pin);
-        interval(interval_millis);
-    }
+    // Returns the updated pin value
+    uint16_t getValue() const;
 
  protected:
     unsigned long previous_millis;
