@@ -23,7 +23,7 @@ Bounce::Bounce()
 void Bounce::attach(int pin) {
     this->pin = pin;
     state = 0;
-    if (digitalRead(pin)) {
+    if (analogRead(pin) > 10) {
         state = SetBouncerFlag(DEBOUNCED_STATE) | SetBouncerFlag(UNSTABLE_STATE);
     }
 #ifdef BOUNCE_LOCK_OUT
@@ -49,7 +49,8 @@ bool Bounce::update()
     state &= ~SetBouncerFlag(STATE_CHANGED);
     // Ignore everything if we are locked out
     if (millis() - previous_millis >= interval_millis) {
-        bool currentState = digitalRead(pin);
+        this->value = analogRead(this->pin);
+        bool currentState = (this->value > 50);
         if ((bool)(state & SetBouncerFlag(DEBOUNCED_STATE)) != currentState) {
             previous_millis = millis();
             state ^= SetBouncerFlag(DEBOUNCED_STATE);
@@ -60,7 +61,8 @@ bool Bounce::update()
 
 #elif defined BOUNCE_WITH_PROMPT_DETECTION
     // Read the state of the switch port into a temporary variable.
-    bool readState = digitalRead(pin);
+    this->value = analogRead(this->pin);
+    bool currentState = (this->value > 50);
 
     // Clear Changed State Flag - will be reset if we confirm a button state change.
     state &= ~SetBouncerFlag(STATE_CHANGED);
@@ -89,7 +91,8 @@ bool Bounce::update()
     return state & SetBouncerFlag(STATE_CHANGED);
 #else
     // Read the state of the switch in a temporary variable.
-    bool currentState = digitalRead(pin);
+    this->value = analogRead(this->pin);
+    bool currentState = (this->value > 50);
     state &= ~SetBouncerFlag(STATE_CHANGED);
 
     // If the reading is different from last reading, reset the debounce counter
