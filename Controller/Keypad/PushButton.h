@@ -12,30 +12,30 @@
 #include "Bounce2.h"
 #include "Button.h"
 
-#define PRESSED_WHEN_HIGH B0
-#define PRESSED_WHEN_LOW B1
-#define ENABLE_INTERNAL_PULLUP B10
+namespace {
+    constexpr uint8_t PRESSED_WHEN_HIGH      = 0b00000000;
+    constexpr uint8_t PRESSED_WHEN_LOW       = 0b00000001;
+    constexpr uint8_t ENABLE_INTERNAL_PULLUP = 0b00000010;
+}
 
 // Define button configuration callback
 typedef void (*PushButtonConfigurationCallback)(Bounce&);
 
 class PushButton : public Button {
-	
-	private:
-		Bounce bouncer;
-		void init(uint8_t, uint8_t);
+public:
+    PushButton(uint8_t pin);
+    PushButton(uint8_t pit, uint8_t options);
+    virtual ~PushButton() = default;
 
-		uint8_t _button_pressed_value;
-		
-	protected:
-		boolean _update_button_state();
-	
-	public:
-		PushButton(uint8_t);
-		PushButton(uint8_t, uint8_t);
-		virtual ~PushButton() = default;
-	
-		void configureButton(PushButtonConfigurationCallback);
+    void configureButton(PushButtonConfigurationCallback configurationCallback);
+
+protected:
+    boolean _update_button_state();
+
+private:
+    Bounce bouncer;
+    uint8_t _button_pressed_value;
+    void init(uint8_t pin, uint8_t options);
 };
 
 #endif /* PUSHBUTTON_H_ */

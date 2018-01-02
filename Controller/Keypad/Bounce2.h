@@ -41,6 +41,9 @@ namespace {
     constexpr uint8_t SetBouncerFlag(const uint8_t n){
         return (1 << n);
     }
+    constexpr uint8_t DEBOUNCED_STATE = 0b00000000;
+    constexpr uint8_t UNSTABLE_STATE  = 0b00000001;
+    constexpr uint8_t STATE_CHANGED   = 0b00000011;
 }
 
 class Bounce
@@ -50,17 +53,16 @@ class Bounce
     Bounce();
 
     // Attach to a pin (and also sets initial state)
-    void attach(int pin);
+    void attach(uint8_t pin);
     
     // Attach to a pin (and also sets initial state) and sets pin to mode (INPUT/INPUT_PULLUP/OUTPUT)
-    void attach(int pin, int mode);
+    void attach(uint8_t pin, uint8_t mode);
 
     // Sets the debounce interval
     void interval(uint16_t interval_millis);
 
     // Updates the pin
-    // Returns 1 if the state changed
-    // Returns 0 if the state did not change
+    // Returns whether the state changed or not
     bool update();
 
     // Returns the updated pin state
@@ -75,7 +77,7 @@ class Bounce
     // Returns the updated pin value
     uint16_t getValue() const;
 
- protected:
+protected:
     unsigned long previous_millis;
     uint16_t interval_millis;
     uint16_t value;

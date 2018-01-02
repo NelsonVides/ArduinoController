@@ -1,16 +1,7 @@
 // Please read Bounce2.h for information about the liscence and authors
 
-#if defined(ARDUINO) && ARDUINO >= 100
 #include "Arduino.h"
-#else
-#include "WProgram.h"
-#endif
 #include "Bounce2.h"
-
-#define DEBOUNCED_STATE 0
-#define UNSTABLE_STATE  1
-#define STATE_CHANGED   3
-
 
 Bounce::Bounce()
     : previous_millis(0)
@@ -20,7 +11,7 @@ Bounce::Bounce()
     , pin(0)
 {}
 
-void Bounce::attach(int pin) {
+void Bounce::attach(uint8_t pin) {
     this->pin = pin;
     state = 0;
     if (analogRead(pin) > 10) {
@@ -33,7 +24,7 @@ void Bounce::attach(int pin) {
 #endif
 }
 
-void Bounce::attach(int pin, int mode){
+void Bounce::attach(uint8_t pin, uint8_t mode){
     pinMode(pin, mode);
     this->attach(pin);
 }
