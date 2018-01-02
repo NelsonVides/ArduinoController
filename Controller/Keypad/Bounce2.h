@@ -37,9 +37,11 @@
 
 #include <inttypes.h>
 
-#ifndef _BV
-#define _BV(n) (1<<(n))
-#endif
+namespace {
+    constexpr uint8_t SetBouncerFlag(const uint8_t n){
+        return (1 << n);
+    }
+}
 
 class Bounce
 {
@@ -81,6 +83,7 @@ class Bounce
  protected:
     unsigned long previous_millis;
     uint16_t interval_millis;
+    uint16_t value;
     uint8_t state;
     uint8_t pin;
 };
