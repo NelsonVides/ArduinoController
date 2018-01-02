@@ -47,6 +47,12 @@ private:
 };
 
 
+
+
+
+/* ************************************************ *
+ * *********** IMPLEMENTATION DETAILS ************* *
+ * ************************************************ */
 // Empty default constructor
 ButtonEventCallback::ButtonEventCallback()  // @suppress("Class members should be properly initialized")
 {

@@ -45,6 +45,7 @@ public:
     bool is(Button&) const;
     bool isPressed() const;
     
+    virtual uint8_t getButtonNumber() const = 0;
 protected:
     virtual bool _update_button_state() = 0;
 
@@ -65,10 +66,16 @@ private:
 };
   
 
+
+
+
+/* ************************************************ *
+ * *********** IMPLEMENTATION DETAILS ************* *
+ * ************************************************ */
 Button::Button() {// @suppress("Class members should be properly initialized")
 	// Initialise variables
 	_button_pressed_timestamp = 0;
-	_is_pressed = 0;
+	_is_pressed = false;
 }
 
 void Button::_button_pressed() {
@@ -88,7 +95,6 @@ void Button::_button_pressed() {
 void Button::_button_released()
 {
 	// Set the button pressed state to false
-    Serial.println("Inside the _button_released method");
 	_is_pressed = false;
 	_execute_callbacks(true);
 }
@@ -126,14 +132,15 @@ bool Button::update()
 	if(_previous_button_state != _new_button_state)
 	{
 		// If the button is now pressed
-        if (_new_button_state == 0) {
-            Serial.print("Yes, the state changed to: "); Serial.println(_new_button_state);
-        }
+	    if (_new_button_state == 0) {
+	        Serial.print("_new_button_state is "); Serial.println(_new_button_state);
+	    }
 		if(_new_button_state){ //FIXME this is never called :( ¿still modern?
+		    //Serial.println("Execute onPressed callbacks");
 			_button_pressed();
 		} else {
 			// Otherwise if it has just been let go
-	        Serial.println("Execute onReleased callbacks");
+	        //Serial.println("Execute onReleased callbacks");
 			_button_released();
 		}
 		return true;	// State has changed

@@ -7,13 +7,13 @@
 #include "Keypad/Button.h"
 #include "Keypad/Keypad.h"
 
-constexpr int rs = 7, en = 6, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
-constexpr int trPin = 0;
-constexpr int btPin = A5;
-constexpr int txSimPin = 11;
-constexpr int rxSimPin = 12;
-constexpr int rstSimPin = 13;
-constexpr int pinPad1 = A1, pinPad2 = A2, pinPad3 = A3, pinPad4 = A4;
+constexpr uint8_t rs = 7, en = 6, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
+constexpr uint8_t trPin = 0;
+constexpr uint8_t btPin = A5;
+constexpr uint8_t txSimPin = 11;
+constexpr uint8_t rxSimPin = 12;
+constexpr uint8_t rstSimPin = 13;
+constexpr uint8_t pinPad1 = A1, pinPad2 = A2, pinPad3 = A3, pinPad4 = A4;
 
 Thermo Therm(trPin);
 LiquidCrystal Lcd(rs, en, d4, d5, d6, d7);
@@ -31,11 +31,9 @@ constexpr long interval = 1000;		// interval at which to blink (milliseconds)
 //bool sent = false;
 
 void onButtonPressed(Button& btn){
-    Serial.println("Button 0 pressed");
-    if (true) {                          //(btn.getButtonNumber() == 0){
-        _stateLCD = !_stateLCD;
-        digitalWrite(8,_stateLCD);
-    } else {
+    Serial.println(btn.getButtonNumber());
+    if (btn.getButtonNumber() == 1){
+        Serial.println("Button 1 pressed");
         _stateLCD = !_stateLCD;
         digitalWrite(8,_stateLCD);
     }
@@ -62,18 +60,10 @@ void setup() {
     pinMode(8, OUTPUT);
     digitalWrite(8,_stateLCD);
     pad.onPress(0, onButtonPressed);
-    if (pad.onRelease(0, onButtonReleased) == CallbackAttachedResponse::attSuccessful) {
-        Serial.println("Attached onReleased 0");
-    }
-    if (pad.onRelease(1, onButtonReleased) == CallbackAttachedResponse::attSuccessful) {
-        Serial.println("Attached onReleased 1");
-    }
-    if (pad.onRelease(2, onButtonReleased) == CallbackAttachedResponse::attSuccessful) {
-        Serial.println("Attached onReleased 2");
-    }
-    if (pad.onRelease(3, onButtonReleased) == CallbackAttachedResponse::attSuccessful) {
-        Serial.println("Attached onReleased 3");
-    }
+    pad.onRelease(0, onButtonReleased);
+    pad.onRelease(1, onButtonReleased);
+    pad.onRelease(2, onButtonReleased);
+    pad.onRelease(3, onButtonReleased);
 }
 
 void loop() {

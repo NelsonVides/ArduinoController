@@ -16,11 +16,19 @@
 
 #include <Arduino.h>
 #include "AnalogPushButtons.h"
-#include "InfoButton.h"
+
+// Forward reference
+class Keypad;
+
+// Define callback types
+typedef void (*KeypadOnPressCallback)(Keypad&);
+typedef void (*KeypadOnEventCallback)(Keypad&, uint16_t);
+typedef void (*KeypadOnEventRepeatCallback)(Keypad&, uint16_t, uint16_t);
+
 
 class Keypad {
 public:
-	Keypad(const int pin1, const int pin2, const int pin3, const int pin4);
+	Keypad(const uint8_t pin1, const uint8_t pin2, const uint8_t pin3, const uint8_t pin4);
 	virtual ~Keypad();
 	void updateKeys();
 
@@ -35,16 +43,22 @@ public:
     bool isPressed(uint8_t butt) const;
 
 private:
-	const int _pin1;
-	const int _pin2;
-	const int _pin3;
-	const int _pin4;
+	const uint8_t _pin1;
+	const uint8_t _pin2;
+	const uint8_t _pin3;
+	const uint8_t _pin4;
 	AnalogPushButtons _rowFourButtons[4];
 };
 
 
 
-Keypad::Keypad(const int pin1, const int pin2, const int pin3, const int pin4)
+
+
+
+/* ************************************************ *
+ * *********** IMPLEMENTATION DETAILS ************* *
+ * ************************************************ */
+Keypad::Keypad(const uint8_t pin1, const uint8_t pin2, const uint8_t pin3, const uint8_t pin4)
 	: _pin1(pin1), _pin2(pin2), _pin3(pin3), _pin4(pin4),
 	  _rowFourButtons({AnalogPushButtons(pin1),
                        AnalogPushButtons(pin2),
@@ -58,9 +72,10 @@ void Keypad::updateKeys()
 {
     for (AnalogPushButtons btn : this->_rowFourButtons) {
         btn.update();
+        delay(9);
+        btn.update();
     }
 }
-
 
 void Keypad::onPress(uint8_t row, ButtonOnPressCallback callback) {
     this->_rowFourButtons[row].onPress(callback);
@@ -88,9 +103,6 @@ bool Keypad::is(AnalogPushButtons &btn1, AnalogPushButtons &btn2) const
 
 bool Keypad::isPressed(uint8_t butt) const
 {
-    //Serial.println("checking if pressed");
-    //Serial.println((butt-1) % 4);
-    //Serial.println(this->_rowFourButtons[(butt-1)%4].getButtonNumber());
     return (this->_rowFourButtons[(butt-1) % 4].getButtonNumber() == butt);
 }
 
