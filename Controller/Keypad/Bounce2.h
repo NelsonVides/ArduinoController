@@ -29,6 +29,9 @@
 #ifndef Bounce2_h
 #define Bounce2_h
 
+// Uncomment the following line for analog pins in use
+#define ANALOG_PINS
+
 // Uncomment the following line for "LOCK-OUT" debounce method
 //#define BOUNCE_LOCK_OUT
 
@@ -50,7 +53,7 @@ class Bounce
 {
  public:
     // Create an instance of the bounce library
-    Bounce();
+    explicit Bounce(uint8_t pin);
 
     // Attach to a pin (and also sets initial state)
     void attach(uint8_t pin);

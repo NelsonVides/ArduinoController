@@ -8,11 +8,13 @@
 #include "PushButton.h"
 
 PushButton::PushButton(uint8_t pin)
+    : bouncer(Bounce(pin))
 {
-    init(pin, ENABLE_INTERNAL_PULLUP);
+    init(pin, INPUT);
 }
 
 PushButton::PushButton(uint8_t pin, uint8_t options)
+    : bouncer(Bounce(pin))
 {
     init(pin, options);
 }
@@ -20,21 +22,16 @@ PushButton::PushButton(uint8_t pin, uint8_t options)
 void PushButton::init(uint8_t pin, uint8_t options)
 {
     if (options & ENABLE_INTERNAL_PULLUP){
-        pinMode(pin, INPUT_PULLUP);
+        bouncer.attach(pin, INPUT_PULLUP);
     } else {
-        pinMode(pin, INPUT);
+        bouncer.attach(pin, INPUT);
     }
-
     if ((options & PRESSED_WHEN_LOW) || (options & ENABLE_INTERNAL_PULLUP)){
         _button_pressed_value = LOW;
     }
     else {
         _button_pressed_value = HIGH;
     }
-
-    // Default configuration for Debounced pin
-    bouncer = Bounce();
-    bouncer.attach(pin);
 }
 
 void PushButton::configureButton(PushButtonConfigurationCallback configurationCallback)

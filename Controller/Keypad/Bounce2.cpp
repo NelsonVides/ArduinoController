@@ -3,12 +3,12 @@
 #include "Arduino.h"
 #include "Bounce2.h"
 
-Bounce::Bounce()
+Bounce::Bounce(uint8_t pin)
     : previous_millis(0)
     , interval_millis(10)
     , state(0)
     , value(0)
-    , pin(0)
+    , pin(pin)
 {}
 
 void Bounce::attach(uint8_t pin) {
@@ -40,8 +40,12 @@ bool Bounce::update()
     state &= ~SetBouncerFlag(STATE_CHANGED);
     // Ignore everything if we are locked out
     if (millis() - previous_millis >= interval_millis) {
-        this->value = analogRead(this->pin);
-        bool currentState = (this->value > 50);
+        #ifdef ANALOG_PINS
+            this->value = analogRead(this->pin);
+            bool currentState = (this->value > 50);
+        #else
+            bool currentState = digitalRead(this->pin);
+        #endif
         if ((bool)(state & SetBouncerFlag(DEBOUNCED_STATE)) != currentState) {
             previous_millis = millis();
             state ^= SetBouncerFlag(DEBOUNCED_STATE);
@@ -52,9 +56,12 @@ bool Bounce::update()
 
 #elif defined BOUNCE_WITH_PROMPT_DETECTION
     // Read the state of the switch port into a temporary variable.
-    this->value = analogRead(this->pin);
-    bool currentState = (this->value > 50);
-
+    #ifdef ANALOG_PINS
+        this->value = analogRead(this->pin);
+        bool currentState = (this->value > 50);
+    #else
+        bool currentState = digitalRead(this->pin);
+    #endif
     // Clear Changed State Flag - will be reset if we confirm a button state change.
     state &= ~SetBouncerFlag(STATE_CHANGED);
 
@@ -82,40 +89,46 @@ bool Bounce::update()
     return state & SetBouncerFlag(STATE_CHANGED);
 #else
     // Read the state of the switch in a temporary variable.
+#ifdef ANALOG_PINS
     this->value = analogRead(this->pin);
     bool currentState = (this->value > 50);
-    state &= ~SetBouncerFlag(STATE_CHANGED);
+#else
+    bool currentState = digitalRead(this->pin);
+#endif
+    state &= ~SetBouncerFlag(STATE_CHANGED); ///reset STATE_CHANGED flag
 
     // If the reading is different from last reading, reset the debounce counter
-    if ( currentState != (bool)(state & SetBouncerFlag(UNSTABLE_STATE)) ) {
+    if (currentState != (bool)(state & SetBouncerFlag(UNSTABLE_STATE))) /// PRESSED_STATE != UNSTABLE_STATE
+    {
         previous_millis = millis();
-        state ^= SetBouncerFlag(UNSTABLE_STATE);
-    } else
-        if ( millis() - previous_millis >= interval_millis ) {
-            // We have passed the threshold time, so the input is now stable
-            // If it is different from last state, set the STATE_CHANGED flag
-            if ((bool)(state & SetBouncerFlag(DEBOUNCED_STATE)) != currentState) {
-                previous_millis = millis();
-                state ^= SetBouncerFlag(DEBOUNCED_STATE);
-                state |= SetBouncerFlag(STATE_CHANGED);
-            }
+        state ^= SetBouncerFlag(UNSTABLE_STATE); ///XOR-on the UNSTABLE_STATE, reset all other flags
+    }
+    if ( millis() - previous_millis >= interval_millis) ///if enought time has passed
+    {
+        // We have passed the threshold time, so the input is now stable
+        // If it is different from last state, set the STATE_CHANGED flag
+        if (currentState != (bool)(state & SetBouncerFlag(DEBOUNCED_STATE))) ///PRESSED_STATE != DEBOUNCED_STATE
+        {
+            previous_millis = millis();
+            state ^= SetBouncerFlag(DEBOUNCED_STATE); /// XOR 0001 =>
+            state |= SetBouncerFlag(STATE_CHANGED);   /// iOR 1000 => turn on the STATE_CHANGED flag
         }
-
-    return state & SetBouncerFlag(STATE_CHANGED);
+    }
+    return state & SetBouncerFlag(STATE_CHANGED); // return STATE_CHANGED flag
 #endif
 }
 
-bool Bounce::read() const
+bool Bounce::read() const ///return if DEBOUNCED
 {
     return state & SetBouncerFlag(DEBOUNCED_STATE);
 }
 
-bool Bounce::rose() const
+bool Bounce::rose() const ///return if DEBOUNCED and CHANGED
 {
     return ( state & SetBouncerFlag(DEBOUNCED_STATE) ) && ( state & SetBouncerFlag(STATE_CHANGED));
 }
 
-bool Bounce::fell() const
+bool Bounce::fell() const ///return if !DEBOUNCED or !CHANGED
 {
     return !rose();
 }
