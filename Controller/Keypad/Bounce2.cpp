@@ -1,7 +1,17 @@
-// Please read Bounce2.h for information about the liscence and authors
+// Please read Bounce2.h for information about the license and authors
 
 #include "Arduino.h"
 #include "Bounce2.h"
+
+//This is an implementation detail that doesn't need to be seen by the outside world.
+namespace {
+    constexpr uint8_t SetBouncerFlag(const uint8_t n){
+        return (1 << n);
+    }
+    constexpr uint8_t DEBOUNCED_STATE = 0b00000000;
+    constexpr uint8_t UNSTABLE_STATE  = 0b00000001;
+    constexpr uint8_t STATE_CHANGED   = 0b00000011;
+}
 
 Bounce::Bounce(uint8_t pin)
     : previous_millis(0)
@@ -9,19 +19,19 @@ Bounce::Bounce(uint8_t pin)
     , state(0)
     , value(0)
     , pin(pin)
-{}
+{
+    this->attach(pin);
+}
 
 void Bounce::attach(uint8_t pin) {
-    this->pin = pin;
-    state = 0;
-    if (analogRead(pin) > 10) {
+    if (digitalRead(pin)) {
         state = SetBouncerFlag(DEBOUNCED_STATE) | SetBouncerFlag(UNSTABLE_STATE);
     }
-#ifdef BOUNCE_LOCK_OUT
-    previous_millis = 0;
-#else
-    previous_millis = millis();
-#endif
+    #ifdef BOUNCE_LOCK_OUT
+        previous_millis = 0;
+    #else
+        previous_millis = millis();
+    #endif
 }
 
 void Bounce::attach(uint8_t pin, uint8_t mode){
@@ -89,12 +99,12 @@ bool Bounce::update()
     return state & SetBouncerFlag(STATE_CHANGED);
 #else
     // Read the state of the switch in a temporary variable.
-#ifdef ANALOG_PINS
-    this->value = analogRead(this->pin);
-    bool currentState = (this->value > 50);
-#else
-    bool currentState = digitalRead(this->pin);
-#endif
+    #ifdef ANALOG_PINS
+        this->value = analogRead(this->pin);
+        bool currentState = (this->value > 50);
+    #else
+        bool currentState = digitalRead(this->pin);
+    #endif
     state &= ~SetBouncerFlag(STATE_CHANGED); ///reset STATE_CHANGED flag
 
     // If the reading is different from last reading, reset the debounce counter
@@ -134,5 +144,5 @@ bool Bounce::fell() const ///return if !DEBOUNCED or !CHANGED
 }
 
 uint16_t Bounce::getValue() const {
-    return value;
+    return this->value;
 }

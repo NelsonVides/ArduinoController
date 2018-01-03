@@ -1,9 +1,12 @@
 /*
  * Button.h
- *
  * Created: 18/11/2014 19:33:02
  *  Author: Richard
  */ 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Forked by Nelson Vides to implement ANALOG_PINS
+ * and modern C++ features
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #ifndef BUTTONEVENTCALLBACK_H
 #define BUTTONEVENTCALLBACK_H
@@ -16,16 +19,16 @@ class ButtonEventCallback {
 public:
     ButtonEventCallback();
 
-    EventType getType();
+    EventType getType() const;
 
-    void setType(EventType);
-    void setDelay(uint16_t);
-    void setMaxDelay(uint16_t);
-    void setRepetitionPeriod(uint16_t);
-    void setCallback(ButtonOnEventCallback);
-    void setRepeatingCallback(ButtonOnEventRepeatCallback);
+    void setType(EventType type);
+    void setDelay(uint16_t delay);
+    void setMaxDelay(uint16_t max_delay);
+    void setRepetitionPeriod(uint16_t repeat_period);
+    void setCallback(ButtonOnEventCallback callback);
+    void setRepeatingCallback(ButtonOnEventRepeatCallback callback_repeating);
 
-    void executeCallbackIfTime(uint16_t, boolean, Button&);
+    void executeCallbackIfTime(uint16_t elapsedTime, boolean release_event, Button& btn);
     void reset();
 
 private:

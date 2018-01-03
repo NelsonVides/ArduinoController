@@ -25,6 +25,10 @@
   Main code by Thomas O Fredericks (tof@t-o-f.info)
   Previous contributions by Eric Lowry, Jim Schimpf and Tom Harkaway
   * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Forked by Nelson Vides to implement ANALOG_PINS
+ * and modern C++ features
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #ifndef Bounce2_h
 #define Bounce2_h
@@ -40,18 +44,9 @@
 
 #include <inttypes.h>
 
-namespace {
-    constexpr uint8_t SetBouncerFlag(const uint8_t n){
-        return (1 << n);
-    }
-    constexpr uint8_t DEBOUNCED_STATE = 0b00000000;
-    constexpr uint8_t UNSTABLE_STATE  = 0b00000001;
-    constexpr uint8_t STATE_CHANGED   = 0b00000011;
-}
-
 class Bounce
 {
- public:
+public:
     // Create an instance of the bounce library
     explicit Bounce(uint8_t pin);
 
@@ -83,7 +78,9 @@ class Bounce
 protected:
     unsigned long previous_millis;
     uint16_t interval_millis;
+#ifdef ANALOG_PINS
     uint16_t value;
+#endif
     uint8_t state;
     uint8_t pin;
 };
