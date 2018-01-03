@@ -1,6 +1,5 @@
 /*
  * Button.cpp
- *
  * Created: 18/11/2014 19:33:09
  *  Author: Richard
  */ 
@@ -72,9 +71,9 @@ bool Button::update()
     //Serial.println("Button Update");
 
     // If the state of the button has changed
-    if(_previous_button_state != _new_button_state){
+    if(_previous_button_state != _new_button_state) {
         // If the button is now pressed
-        if(_new_button_state){
+        if(_new_button_state) {
             _button_pressed();
         } else {
             // Otherwise if it has just been let go
@@ -84,10 +83,9 @@ bool Button::update()
     // If the state hasn't changed but the button is pressed - ie it is being held
     } else if(_new_button_state){
         _button_held();
-        return false;	// State hasn't changed
-    } else {
-        //TODO: implement missing case
     }
+    // If we reach this far, state hasn't changed
+    return false;
 }
 
 void Button::onPress(ButtonOnPressCallback callback)

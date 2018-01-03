@@ -1,6 +1,5 @@
 /*
  * PushButton.cpp
- *
  * Created: 18/11/2014 19:33:23
  *  Author: Richard
  */ 
@@ -45,4 +44,9 @@ boolean PushButton::_update_button_state()
     bouncer.update();
     // Return whether it is pressed or not
     return (bouncer.read() == _button_pressed_value);
+}
+
+uint16_t PushButton::getAnalogValue() const
+{
+    return this->bouncer.getValue();
 }

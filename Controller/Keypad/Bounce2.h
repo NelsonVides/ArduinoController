@@ -72,8 +72,10 @@ public:
     // Returns the rising pin state
     bool rose() const;
 
+#ifdef ANALOG_PINS
     // Returns the updated pin value
     uint16_t getValue() const;
+#endif
 
 protected:
     unsigned long previous_millis;

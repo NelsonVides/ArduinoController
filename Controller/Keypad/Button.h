@@ -15,7 +15,7 @@
 #include <Arduino.h>
 
 // The maximum number of callbacks available to each button. A higher number will use more memory and be (slightly) slower
-#define MAX_CALLBACKS_PER_BUTTON 3
+constexpr uint8_t MAX_CALLBACKS_PER_BUTTON = 3;
 
 // Forward reference
 class Button;
@@ -34,15 +34,41 @@ class Button {
 public:
     Button();
     virtual ~Button() = default;
+
+    /// ButtonOnPressCallback is a function which will be called as soon as the button is pressed.
+    /// It must be defined with the parameters shown below
+    /// void callThisFunctionOnPress(Button& btn);
     void onPress(ButtonOnPressCallback);
+
+    /// ButtonOnEventCallback is a function which is called when the button is released.
+    /// It must be defined with the parameters shown below
+    /// void callThisFunctionOnRelease(Button& btn, uint_16t duration);
     CallbackAttachedResponse onRelease(ButtonOnEventCallback);
+    /// as above, plus wait if the button is held for at-least waitms
+    /// onReleaseCallbackFunction will be called.
     CallbackAttachedResponse onRelease(uint16_t, ButtonOnEventCallback);
+    /// as above, plus max_wait if the button is held for more than max_waitms
+    /// onReleaseCallbackFunction will not be called.
     CallbackAttachedResponse onRelease(uint16_t, uint16_t, ButtonOnEventCallback);
+
+    /// duration how long the button must be held before onHoldCallbackFunction is called.
+    /// onHoldCallbackFunction is a function which is called when the button is held.
+    /// It must be defined with the parameters shown below
+    ///void callThisFuntionOnHold(Button& btn, uint_16t duration)
     CallbackAttachedResponse onHold(uint16_t, ButtonOnEventCallback);
+
+    ///duration how long the button must be held before onHoldAndRepeatCallbackFunction is called. repeat_every how long to wait before onHoldAndRepeatCallbackFunction is called repeatedly. onHoldAndRepeatCallbackFunction is a function which is called repeatedly when the button is held. It must be defined with the parameters shown below
+    ///void callThisFunctionOnHoldAndRepeat(Button& btn, uint16_t duration, uint8_t repeat_count)
     CallbackAttachedResponse onHoldRepeat(uint16_t, uint16_t, ButtonOnEventRepeatCallback);
 
+    /// Update the button state - this will call any callbacks that are necessary.
+    /// Returns true if the state changes.
     bool update();
+
+    /// Return whether or not the button is the same as the btn passed
     bool is(Button&) const;
+
+    /// Return whether or not the button is currently pressed.
     bool isPressed() const;
 
 protected:

@@ -8,7 +8,6 @@
  * and modern C++ features
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-
 #ifndef PUSHBUTTON_H_
 #define PUSHBUTTON_H_
 
@@ -26,7 +25,9 @@ class PushButton : public Button {
 public:
     PushButton(uint8_t pin);
     PushButton(uint8_t pit, uint8_t options);
+
     virtual ~PushButton() = default;
+    uint16_t getAnalogValue() const; //TODO: make this readable for the callbacks
 
     void configureButton(PushButtonConfigurationCallback configurationCallback);
 

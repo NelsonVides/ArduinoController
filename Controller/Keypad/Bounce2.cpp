@@ -14,16 +14,19 @@ namespace {
 }
 
 Bounce::Bounce(uint8_t pin)
-    : previous_millis(0)
-    , interval_millis(10)
-    , state(0)
-    , value(0)
-    , pin(pin)
+    : previous_millis(0),
+      interval_millis(10),
+#ifdef ANALOG_PINS
+      value(0),
+#endif
+      state(0),
+      pin(pin)
 {
     this->attach(pin);
 }
 
 void Bounce::attach(uint8_t pin) {
+    this->pin = pin;
     if (digitalRead(pin)) {
         state = SetBouncerFlag(DEBOUNCED_STATE) | SetBouncerFlag(UNSTABLE_STATE);
     }
@@ -135,7 +138,7 @@ bool Bounce::read() const ///return if DEBOUNCED
 
 bool Bounce::rose() const ///return if DEBOUNCED and CHANGED
 {
-    return ( state & SetBouncerFlag(DEBOUNCED_STATE) ) && ( state & SetBouncerFlag(STATE_CHANGED));
+    return (state & SetBouncerFlag(DEBOUNCED_STATE) ) && ( state & SetBouncerFlag(STATE_CHANGED));
 }
 
 bool Bounce::fell() const ///return if !DEBOUNCED or !CHANGED
@@ -143,6 +146,8 @@ bool Bounce::fell() const ///return if !DEBOUNCED or !CHANGED
     return !rose();
 }
 
+#ifdef ANALOG_PINS
 uint16_t Bounce::getValue() const {
     return this->value;
 }
+#endif
