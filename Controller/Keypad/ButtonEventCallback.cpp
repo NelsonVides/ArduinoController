@@ -1,6 +1,5 @@
 /*
  * ButtonEventCallback.cpp
- *
  * Created: 18/11/2014 19:33:09
  *  Author: Richard
  */ 
@@ -9,15 +8,7 @@
 #include "ButtonEventCallback.h"
 
 // Empty default constructor
-ButtonEventCallback::ButtonEventCallback() :
-    _type(EventType::evtUninitialised),
-    _delay(0),
-    _max_delay(0),
-    _repeat_period(0),
-    _execution_count(1),
-    _next_execution_time(0),
-    _callback(nullptr),
-    _callback_repeating(nullptr)
+ButtonEventCallback::ButtonEventCallback()
 {}
 
 EventType ButtonEventCallback::getType() const

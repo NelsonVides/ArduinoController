@@ -21,9 +21,9 @@ constexpr uint8_t MAX_CALLBACKS_PER_BUTTON = 3;
 class Button;
 
 // Define callback types
-typedef void (*ButtonOnPressCallback)(Button&);
-typedef void (*ButtonOnEventCallback)(Button&, uint16_t);
-typedef void (*ButtonOnEventRepeatCallback)(Button&, uint16_t, uint16_t);
+using ButtonOnPressCallback = void(*)(Button&);
+using ButtonOnEventCallback = void(*)(Button&, uint16_t);
+using ButtonOnEventRepeatCallback = void(*)(Button&, uint16_t, uint16_t);
 
 enum class EventType {evtUninitialised, evtRelease, evtHold, evtHoldRepeat};
 enum class CallbackAttachedResponse {attSuccessful, attNoMoreRoom};
@@ -75,17 +75,16 @@ protected:
     virtual bool _update_button_state() = 0;
 
 private:
-    uint32_t _button_pressed_timestamp;								// When the button was originally pressed
-    bool _is_pressed;											// Whether or not the button is currently pressed
-
-    ButtonOnPressCallback _on_press_callback;						// A callback for when the button is initially pressed
+    uint32_t _button_pressed_timestamp = 0;                     // When the button was originally pressed
+    bool _is_pressed = false;                                   // Whether or not the button is currently pressed
+    ButtonOnPressCallback _on_press_callback = nullptr;			// A callback for when the button is initially pressed
     ButtonEventCallback _eventCallbacks[MAX_CALLBACKS_PER_BUTTON];	// An array of callbacks for Release, Hold and HoldRepeat events
 
     void _button_pressed();
     void _button_released();
     void _button_held();
     uint16_t _button_time_elapsed() const;
-    void _execute_callbacks(bool);
+    void _execute_callbacks(bool release_event);
     ButtonEventCallback* getNextAvailableCallback();
 };
   

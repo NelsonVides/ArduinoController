@@ -3,17 +3,15 @@
 #include <Sim800L.h>
 
 #include "classes/Thermo.h"
-
+#include "Keypad/Bouncer.h"    // https://github.com/thomasfredericks/Bounce-Arduino-Wiring
 #include "Keypad/Button.h"
 #include "Keypad/ButtonEventCallback.h"
 #include "Keypad/PushButton.h"
-#include "Keypad/Bounce2.h"    // https://github.com/thomasfredericks/Bounce-Arduino-Wiring
 
-
+unsigned long previousMillis = 0;   // will store last time LED was updated
+constexpr uint16_t interval = 1000;     // interval at which to blink (milliseconds)
 constexpr uint8_t trPin = 0;
 Thermo Therm(trPin);
-unsigned long previousMillis = 0;   // will store last time LED was updated
-constexpr long interval = 1000;     // interval at which to blink (milliseconds)
 
 constexpr uint8_t rs = 7, en = 6, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 LiquidCrystal Lcd(rs, en, d4, d5, d6, d7);
@@ -22,13 +20,10 @@ bool _stateLCD = true;
 
 
 // Create an instance of PushButton reading digital pin 5
-PushButton button1 = PushButton(A1,INPUT);
-PushButton button2 = PushButton(A2,INPUT);
-PushButton button3 = PushButton(A3,INPUT);
-PushButton button4 = PushButton(A4,INPUT);
-// Use this function to configure the internal Bounce object to suit you. See the documentation at: https://github.com/thomasfredericks/Bounce2/wiki
-// This function can be left out if the defaults are acceptable - just don't call configureButton
-void configurePushButton(Bounce& bouncedButton);
+PushButton button1 = PushButton(A1);
+PushButton button2 = PushButton(A2);
+PushButton button3 = PushButton(A3);
+PushButton button4 = PushButton(A4);
 // btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
 void onButtonPressed(Button& btn);
 // duration reports back how long it has been since the button was originally pressed.
@@ -41,7 +36,6 @@ void onButtonReleased(Button& btn, uint16_t duration);
 
 void setup() {
 	Serial.begin(115200);
-
 	Serial.println("INIT of everything");
 
 	Lcd.begin(16, 2);
@@ -53,8 +47,6 @@ void setup() {
 
     pinMode(8, OUTPUT);
     digitalWrite(8,_stateLCD);
-    // Configure the button as you'd like - not necessary if you're happy with the defaults
-    button1.configureButton(configurePushButton);
 
     // When the button is first pressed, call the function onButtonPressed (further down the page)
     button1.onPress(onButtonPressed);
@@ -75,18 +67,16 @@ void loop() {
 	//measure temperature
 	float temperatureCelsius = Therm.getCelsius();
 
-	// Keypad state
-	//pad.updateKeys();
-
 	unsigned long currentMillis = millis();
 	if (currentMillis - previousMillis >= interval) {
 		previousMillis = currentMillis;
-		//Serial print
 		//Serial.println(temperatureCelsius);
-		//LCD
 		Lcd.setCursor(10, 1);
 		Lcd.print(temperatureCelsius);
 	}
+
+    // Keypad state
+    //pad.updateKeys();
     button1.update();
     button2.update();
     button3.update();
@@ -106,12 +96,6 @@ void loop() {
 
 
 
-// Use this function to configure the internal Bounce object to suit you. See the documentation at: https://github.com/thomasfredericks/Bounce2/wiki
-// This function can be left out if the defaults are acceptable - just don't call configureButton
-void configurePushButton(Bounce& bouncedButton){
-        // Set the debounce interval to 15ms - default is 10ms
-        bouncedButton.interval(15);
-}
 
 // btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
 void onButtonPressed(Button& btn){

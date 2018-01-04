@@ -44,20 +44,11 @@
 
 #include <inttypes.h>
 
-class Bounce
+class Bouncer
 {
 public:
     // Create an instance of the bounce library
-    explicit Bounce(uint8_t pin);
-
-    // Attach to a pin (and also sets initial state)
-    void attach(uint8_t pin);
-    
-    // Attach to a pin (and also sets initial state) and sets pin to mode (INPUT/INPUT_PULLUP/OUTPUT)
-    void attach(uint8_t pin, uint8_t mode);
-
-    // Sets the debounce interval
-    void interval(uint16_t interval_millis);
+    explicit Bouncer(uint8_t pin);
 
     // Updates the pin
     // Returns whether the state changed or not
@@ -78,12 +69,12 @@ public:
 #endif
 
 protected:
-    unsigned long previous_millis;
-    uint16_t interval_millis;
+    unsigned long previous_millis = 0;
+    uint16_t interval_millis = 10;
 #ifdef ANALOG_PINS
-    uint16_t value;
+    uint16_t value = 0;
 #endif
-    uint8_t state;
+    uint8_t state = 0;
     uint8_t pin;
 };
 

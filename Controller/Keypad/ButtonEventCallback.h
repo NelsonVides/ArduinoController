@@ -32,20 +32,20 @@ public:
     void reset();
 
 private:
-    EventType _type;
-    uint16_t _delay;
-    uint16_t _max_delay;
-    uint16_t _repeat_period;
-    uint8_t _execution_count;
+    EventType _type = EventType::evtUninitialised;
+    uint16_t _delay = 0;
+    uint16_t _max_delay = 0;
+    uint16_t _repeat_period = 0;
+    uint8_t _execution_count= 1;
 
     void calculateNextExecutionTime();
 
-    // Callbacks
-    ButtonOnEventCallback _callback;
-    ButtonOnEventRepeatCallback _callback_repeating;
-
     // Keep track of when the callback should be executed
-    uint16_t _next_execution_time;
+    uint16_t _next_execution_time = 0;
+
+    // Callbacks
+    ButtonOnEventCallback _callback = nullptr;
+    ButtonOnEventRepeatCallback _callback_repeating = nullptr;
 };
 
 #endif // BUTTONEVENTCALLBACK_H

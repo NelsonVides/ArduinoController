@@ -7,10 +7,7 @@
 #include "Button.h"
 #include "ButtonEventCallback.h"
 
-Button::Button() :
-    _button_pressed_timestamp(0),
-    _is_pressed(0),
-    _on_press_callback(nullptr)
+Button::Button()
 {}
 
 void Button::_button_pressed()
@@ -47,7 +44,6 @@ void Button::_button_held()
 void Button::_execute_callbacks(bool release_event)
 {
     uint16_t button_time_elapsed = this->_button_time_elapsed();
-
     // Iterate over all callbacks
     for(uint8_t i = 0; i < MAX_CALLBACKS_PER_BUTTON - 1; i++){
         this->_eventCallbacks[i].executeCallbackIfTime(button_time_elapsed, release_event, *this);
