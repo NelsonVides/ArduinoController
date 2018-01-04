@@ -4,7 +4,7 @@
  *  Author: Richard
  */ 
  
-#include "Button.h"
+#include "PushButton.h"
 #include "ButtonEventCallback.h"
 
 // Empty default constructor
@@ -46,27 +46,27 @@ void ButtonEventCallback::setRepeatingCallback(ButtonOnEventRepeatCallback callb
     this->_callback_repeating = callback_repeating;
 }
 
-void ButtonEventCallback::executeCallbackIfTime(uint16_t elapsedTime, boolean release_event, Button& btn)
+void ButtonEventCallback::executeCallbackIfTime(uint16_t elapsedTime, bool release_event, PushButton& btn)
 {
     // Only process callbacks that have been initialised
-    if(_type != EventType::evtUninitialised){
-        if (release_event && _type == EventType::evtRelease){ // Only check release callbacks at the right time.
-            if(elapsedTime > _next_execution_time && elapsedTime < _max_delay && _execution_count == 1){
-                if(_callback){
+    if(_type != EventType::evtUninitialised) {
+        if (release_event && (_type == EventType::evtRelease)) { // Only check release callbacks at the right time.
+            if((elapsedTime > _next_execution_time) && (elapsedTime < _max_delay) && (_execution_count == 1)){
+                if(_callback) {
                     _callback(btn, elapsedTime);
                 }
             _execution_count++;
             }
-        } else if (_type == EventType::evtHold){
-            if(elapsedTime > _next_execution_time && _execution_count == 1){
-                if(_callback){
+        } else if (_type == EventType::evtHold) {
+            if((elapsedTime > _next_execution_time) && (_execution_count == 1)) {
+                if(_callback) {
                     _callback(btn, elapsedTime);
                 }
                 _execution_count++;
             }
-        } else if (_type == EventType::evtHoldRepeat){
-            if(elapsedTime > _next_execution_time){
-                if(_callback_repeating){
+        } else if (_type == EventType::evtHoldRepeat) {
+            if(elapsedTime > _next_execution_time) {
+                if(_callback_repeating) {
                     _callback_repeating(btn, elapsedTime, _execution_count);
                 }
                 calculateNextExecutionTime();

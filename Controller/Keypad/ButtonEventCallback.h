@@ -13,14 +13,13 @@
 
 #include <inttypes.h>
 #include <Arduino.h>
-#include "./Button.h"
+#include "PushButton.h"
 
 class ButtonEventCallback {
 public:
     ButtonEventCallback();
 
     EventType getType() const;
-
     void setType(EventType type);
     void setDelay(uint16_t delay);
     void setMaxDelay(uint16_t max_delay);
@@ -28,7 +27,7 @@ public:
     void setCallback(ButtonOnEventCallback callback);
     void setRepeatingCallback(ButtonOnEventRepeatCallback callback_repeating);
 
-    void executeCallbackIfTime(uint16_t elapsedTime, boolean release_event, Button& btn);
+    void executeCallbackIfTime(uint16_t elapsedTime, bool release_event, PushButton& btn);
     void reset();
 
 private:
@@ -36,16 +35,14 @@ private:
     uint16_t _delay = 0;
     uint16_t _max_delay = 0;
     uint16_t _repeat_period = 0;
-    uint8_t _execution_count= 1;
-
-    void calculateNextExecutionTime();
-
-    // Keep track of when the callback should be executed
+    uint8_t _execution_count = 1;
     uint16_t _next_execution_time = 0;
 
     // Callbacks
     ButtonOnEventCallback _callback = nullptr;
     ButtonOnEventRepeatCallback _callback_repeating = nullptr;
+
+    void calculateNextExecutionTime();
 };
 
 #endif // BUTTONEVENTCALLBACK_H
