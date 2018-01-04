@@ -2,19 +2,17 @@
 #include <LiquidCrystal.h>
 #include <Sim800L.h>
 
-#include "classes/Thermo.h"
+#include "classes/Thermometer.h"
 #include "Keypad/PushButton.h"
 
 unsigned long previousMillis = 0;   // will store last time LED was updated
 constexpr uint16_t interval = 1000;     // interval at which to blink (milliseconds)
 constexpr uint8_t trPin = 0;
-Thermo Therm(trPin);
+Thermometer Therm(trPin);
 
 constexpr uint8_t rs = 7, en = 6, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 LiquidCrystal Lcd(rs, en, d4, d5, d6, d7);
 bool _stateLCD = true;
-
-
 
 // Create an instance of PushButton reading digital pin 5
 PushButton button1 = PushButton(A1);
@@ -61,15 +59,10 @@ void setup() {
 }
 
 void loop() {
-	//measure temperature
-	float temperatureCelsius = Therm.getCelsius();
-
-	unsigned long currentMillis = millis();
-	if (currentMillis - previousMillis >= interval) {
-		previousMillis = currentMillis;
-		//Serial.println(temperatureCelsius);
-		Lcd.setCursor(10, 1);
-		Lcd.print(temperatureCelsius);
+	//measure temperature //float temperatureCelsius = Therm.getCelsius();
+	if (Therm.isTime()) {
+        Lcd.setCursor(10, 1);
+        Lcd.print(Therm.getCelsius()); //Lcd.print(temperatureCelsius);
 	}
 
     // Keypad state
