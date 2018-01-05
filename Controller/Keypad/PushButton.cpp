@@ -169,7 +169,7 @@ ButtonEventCallback* PushButton::getNextAvailableCallback()
     return nullptr;
 }
 
-bool PushButton::is(PushButton &btn) const
+bool PushButton::is(const PushButton& btn) const
 {
     return (this == &btn);
 }

@@ -18,7 +18,6 @@ constexpr uint8_t MAX_CALLBACKS_PER_BUTTON = 3;
 
 // Forward reference
 class PushButton;
-class ButtonEventCallback;
 
 // Define callback types
 using ButtonOnPressCallback = void(*)(PushButton&);
@@ -33,8 +32,7 @@ enum class CallbackAttachedResponse {attSuccessful, attNoMoreRoom};
  * Then, ButtonEventCallback enters definition, and this only uses pointers or references
  * to PushButton, so a forward referece sufices.
  * Then, PushButton enters, which does use both pointers and common objects of type
- * ButtonEventCallback, hence, it needs it to be fully defined already.
- */
+ * ButtonEventCallback, hence, it needs it to be fully defined already. */
 #include "ButtonEventCallback.h"
 
 class PushButton {
@@ -72,12 +70,12 @@ public:
     bool update();
 
     /// Return whether or not the button is the same as the btn passed
-    bool is(PushButton&) const;
+    bool is(const PushButton& btn) const;
 
     /// Return whether or not the button is currently pressed.
     bool isPressed() const;
 
-    uint16_t getAnalogValue() const; //TODO: make this readable for the callbacks
+    uint16_t getAnalogValue() const;
 
 protected:
     bool _update_button_state();

@@ -26,6 +26,7 @@ void onButtonPressed(PushButton& btn);
 void onButtonHeld(PushButton& btn, uint16_t duration, uint16_t repeatCount);
 // duration reports back the total time that the button was held down
 void onButtonReleased(PushButton& btn, uint16_t duration);
+
 //constexpr uint8_t pinPad1 = A1, pinPad2 = A2, pinPad3 = A3, pinPad4 = A4;
 //Keypad pad(pinPad1, pinPad2, pinPad3, pinPad4);
 
@@ -88,47 +89,47 @@ void loop() {
 
 
 // btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
-void onButtonPressed(PushButton& btn){
+void onButtonPressed(const PushButton& btn){
     int v4 = btn.getAnalogValue();
-        if(btn.is(button1)){
-            if (v4>100 && v4<300)
-                Serial.print("Button 1");
-            if (v4>300 && v4<550)
-                Serial.print("Button 2");
-            if (v4>550 && v4<800)
-                Serial.print("Button 3");
-            if (v4>960)
-                Serial.print("Button 4");
-        } else if (btn.is(button2)){
-            if (v4>100 && v4<300)
-                Serial.print("Button 5");
-            if (v4>300 && v4<550)
-                Serial.print("Button 6");
-            if (v4>550 && v4<800)
-                Serial.print("Button 7");
-            if (v4>960)
-                Serial.print("Button 8");
-        } else if (btn.is(button3)){
-            if (v4>100 && v4<300)
-                Serial.print("Button 9");
-            if (v4>300 && v4<550)
-                Serial.print("Button 10");
-            if (v4>550 && v4<800)
-                Serial.print("Button 11");
-            if (v4>960)
-                Serial.print("Button 12");
-        } else if (btn.is(button4)){
-            if (v4>100 && v4<300)
-                Serial.print("Button 13");
-            if (v4>300 && v4<550)
-                Serial.print("Button 14");
-            if (v4>550 && v4<800)
-                Serial.print("Button 15");
-            if (v4>960)
-                Serial.print("Button 16");
-        } else {
-           Serial.print("Hmmm, no button was");
-        }
+    if(btn.is(button1)){
+        if (v4>100 && v4<300)
+            Serial.print("Button 1");
+        if (v4>300 && v4<550)
+            Serial.print("Button 2");
+        if (v4>550 && v4<800)
+            Serial.print("Button 3");
+        if (v4>960)
+            Serial.print("Button 4");
+    } else if (btn.is(button2)){
+        if (v4>100 && v4<300)
+            Serial.print("Button 5");
+        if (v4>300 && v4<550)
+            Serial.print("Button 6");
+        if (v4>550 && v4<800)
+            Serial.print("Button 7");
+        if (v4>960)
+            Serial.print("Button 8");
+    } else if (btn.is(button3)){
+        if (v4>100 && v4<300)
+            Serial.print("Button 9");
+        if (v4>300 && v4<550)
+            Serial.print("Button 10");
+        if (v4>550 && v4<800)
+            Serial.print("Button 11");
+        if (v4>960)
+            Serial.print("Button 12");
+    } else if (btn.is(button4)){
+        if (v4>100 && v4<300)
+            Serial.print("Button 13");
+        if (v4>300 && v4<550)
+            Serial.print("Button 14");
+        if (v4>550 && v4<800)
+            Serial.print("Button 15");
+        if (v4>960)
+            Serial.print("Button 16");
+    } else {
+       Serial.print("Hmmm, no button was");
+    }
     Serial.println(" pressed");
 }
 
