@@ -9,10 +9,6 @@
 
 #include <Arduino.h>
 
-namespace ThermSpace {
-
-}
-
 class Thermometer {
 public:
     explicit Thermometer(uint8_t pin);

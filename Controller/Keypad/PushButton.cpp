@@ -19,9 +19,29 @@ boolean PushButton::_update_button_state()
     return bouncer.read();
 }
 
-uint16_t PushButton::getAnalogValue() const
-{
-    return this->bouncer.getValue();
+buttonNumber PushButton::getLastPressedButton() {
+    uint16_t internalValue = this->bouncer.getValue();
+    if (internalValue < BouncerConstants::NOISE_TOLERANCE) {
+        return this->_last_button_pressed;
+    } else {
+        if (internalValue>100 && internalValue<300) {
+            this->_last_button_pressed = buttonNumber::R1;
+            return buttonNumber::R1;
+        }
+        if (internalValue>300 && internalValue<550) {
+            this->_last_button_pressed = buttonNumber::R2;
+            return buttonNumber::R2;
+        }
+        if (internalValue>550 && internalValue<800) {
+            this->_last_button_pressed = buttonNumber::R3;
+            return buttonNumber::R3;
+        }
+        if (internalValue>960) {
+            this->_last_button_pressed = buttonNumber::R4;
+            return buttonNumber::R4;
+        }
+        return buttonNumber::btnUnkown;
+    }
 }
 
 
@@ -39,7 +59,7 @@ void PushButton::_button_pressed()
     }
 
     // Reset all callbacks
-    for(uint8_t i = 0; i < MAX_CALLBACKS_PER_BUTTON; i++){
+    for(uint8_t i = 0; i < PushButtonEventsResponse::MAX_CALLBACKS_PER_BUTTON; i++){
         this->_eventCallbacks[i].reset();
     }
 }
@@ -60,7 +80,7 @@ void PushButton::_execute_callbacks(bool release_event)
 {
     uint16_t button_time_elapsed = this->_button_time_elapsed();
     // Iterate over all callbacks
-    for(uint8_t i = 0; i < MAX_CALLBACKS_PER_BUTTON - 1; i++){
+    for(uint8_t i = 0; i < PushButtonEventsResponse::MAX_CALLBACKS_PER_BUTTON - 1; i++){
         this->_eventCallbacks[i].executeCallbackIfTime(button_time_elapsed, release_event, *this);
     }
 }
@@ -104,65 +124,65 @@ void PushButton::onPress(ButtonOnPressCallback callback)
     this->_on_press_callback = callback;
 }
 
-CallbackAttachedResponse PushButton::onRelease(ButtonOnEventCallback callback)
+PushButtonEventsResponse::CallbackAttachedResponse PushButton::onRelease(ButtonOnEventCallback callback)
 {
     return onRelease(0, callback);
 }
 
-CallbackAttachedResponse PushButton::onRelease(uint16_t wait, ButtonOnEventCallback callback)
+PushButtonEventsResponse::CallbackAttachedResponse PushButton::onRelease(uint16_t wait, ButtonOnEventCallback callback)
 {
     return onRelease(wait, -1, callback);
 }
 
-CallbackAttachedResponse PushButton::onRelease(uint16_t wait, uint16_t max_wait, ButtonOnEventCallback callback)
+PushButtonEventsResponse::CallbackAttachedResponse PushButton::onRelease(uint16_t wait, uint16_t max_wait, ButtonOnEventCallback callback)
 {
     ButtonEventCallback* nextCallback = this->getNextAvailableCallback();
     if(nextCallback) {
-        nextCallback->setType(EventType::evtRelease);
+        nextCallback->setType(PushButtonEventsResponse::EventType::evtRelease);
         nextCallback->setDelay(wait);
         nextCallback->setMaxDelay(max_wait);
         nextCallback->setCallback(callback);
         // Now that we're done, let the user know
-        return CallbackAttachedResponse::attSuccessful;
+        return PushButtonEventsResponse::CallbackAttachedResponse::attSuccessful;
     }
     // If we get this far, there was no more space to add a handler
-    return CallbackAttachedResponse::attNoMoreRoom;
+    return PushButtonEventsResponse::CallbackAttachedResponse::attNoMoreRoom;
 }
 
-CallbackAttachedResponse PushButton::onHold(uint16_t duration, ButtonOnEventCallback callback)
+PushButtonEventsResponse::CallbackAttachedResponse PushButton::onHold(uint16_t duration, ButtonOnEventCallback callback)
 {
     ButtonEventCallback* nextCallback = getNextAvailableCallback();
     if(nextCallback) {
-        nextCallback->setType(EventType::evtHold);
+        nextCallback->setType(PushButtonEventsResponse::EventType::evtHold);
         nextCallback->setDelay(duration);
         nextCallback->setCallback(callback);
         // Now that we're done, let the user know
-        return CallbackAttachedResponse::attSuccessful;
+        return PushButtonEventsResponse::CallbackAttachedResponse::attSuccessful;
     }
     // If we get this far, there was no more space to add a handler
-    return CallbackAttachedResponse::attNoMoreRoom;
+    return PushButtonEventsResponse::CallbackAttachedResponse::attNoMoreRoom;
 }
 
-CallbackAttachedResponse PushButton::onHoldRepeat(uint16_t duration, uint16_t repeat_every, ButtonOnEventRepeatCallback callback)
+PushButtonEventsResponse::CallbackAttachedResponse PushButton::onHoldRepeat(uint16_t duration, uint16_t repeat_every, ButtonOnEventRepeatCallback callback)
 {
     ButtonEventCallback* nextCallback = getNextAvailableCallback();
     if(nextCallback) {
-        nextCallback->setType(EventType::evtHoldRepeat);
+        nextCallback->setType(PushButtonEventsResponse::EventType::evtHoldRepeat);
         nextCallback->setDelay(duration);
         nextCallback->setRepetitionPeriod(repeat_every);
         nextCallback->setRepeatingCallback(callback);
         // Now that we're done, let the user know
-        return CallbackAttachedResponse::attSuccessful;
+        return PushButtonEventsResponse::CallbackAttachedResponse::attSuccessful;
     }
     // If we get this far, there was no more space to add a handler
-    return CallbackAttachedResponse::attNoMoreRoom;
+    return PushButtonEventsResponse::CallbackAttachedResponse::attNoMoreRoom;
 }
 
 ButtonEventCallback* PushButton::getNextAvailableCallback()
 {
-    for(uint8_t i = 0; i < MAX_CALLBACKS_PER_BUTTON - 1; i++){
+    for(uint8_t i = 0; i < PushButtonEventsResponse::MAX_CALLBACKS_PER_BUTTON - 1; i++){
         // If this callback handler has not be initialised, we can use it
-        if(this->_eventCallbacks[i].getType() == EventType::evtUninitialised){
+        if(this->_eventCallbacks[i].getType() == PushButtonEventsResponse::EventType::evtUninitialised){
             return &_eventCallbacks[i];
         }
     }

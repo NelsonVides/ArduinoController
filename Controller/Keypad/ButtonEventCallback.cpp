@@ -11,12 +11,12 @@
 ButtonEventCallback::ButtonEventCallback()
 {}
 
-EventType ButtonEventCallback::getType() const
+PushButtonEventsResponse::EventType ButtonEventCallback::getType() const
 {
     return this->_type;
 }
 
-void ButtonEventCallback::setType(EventType type)
+void ButtonEventCallback::setType(PushButtonEventsResponse::EventType type)
 {
     this->_type = type;
 }
@@ -49,22 +49,22 @@ void ButtonEventCallback::setRepeatingCallback(ButtonOnEventRepeatCallback callb
 void ButtonEventCallback::executeCallbackIfTime(uint16_t elapsedTime, bool release_event, PushButton& btn)
 {
     // Only process callbacks that have been initialised
-    if(_type != EventType::evtUninitialised) {
-        if (release_event && (_type == EventType::evtRelease)) { // Only check release callbacks at the right time.
+    if(_type != PushButtonEventsResponse::EventType::evtUninitialised) {
+        if (release_event && (_type == PushButtonEventsResponse::EventType::evtRelease)) { // Only check release callbacks at the right time.
             if((elapsedTime > _next_execution_time) && (elapsedTime < _max_delay) && (_execution_count == 1)){
                 if(_callback) {
                     _callback(btn, elapsedTime);
                 }
             _execution_count++;
             }
-        } else if (_type == EventType::evtHold) {
+        } else if (_type == PushButtonEventsResponse::EventType::evtHold) {
             if((elapsedTime > _next_execution_time) && (_execution_count == 1)) {
                 if(_callback) {
                     _callback(btn, elapsedTime);
                 }
                 _execution_count++;
             }
-        } else if (_type == EventType::evtHoldRepeat) {
+        } else if (_type == PushButtonEventsResponse::EventType::evtHoldRepeat) {
             if(elapsedTime > _next_execution_time) {
                 if(_callback_repeating) {
                     _callback_repeating(btn, elapsedTime, _execution_count);

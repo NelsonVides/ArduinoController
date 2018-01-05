@@ -44,6 +44,10 @@
 
 #include <inttypes.h>
 
+namespace BouncerConstants {
+    constexpr uint16_t NOISE_TOLERANCE = 50;
+}
+
 class Bouncer
 {
 public:

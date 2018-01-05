@@ -9,7 +9,6 @@ namespace {
     constexpr uint8_t DEBOUNCED_STATE = 0b00000001;
     constexpr uint8_t UNSTABLE_STATE  = 0b00000010;
     constexpr uint8_t STATE_CHANGED   = 0b00001000;
-    constexpr uint8_t NOISE_TOLERANCE = 50;
 }
 
 Bouncer::Bouncer(uint8_t pin) :
@@ -35,7 +34,7 @@ bool Bouncer::update()
     if (millis() - previous_millis >= interval_millis) {
         #ifdef ANALOG_PINS
             this->value = analogRead(this->pin);
-            bool currentState = (this->value > NOISE_TOLERANCE);
+            bool currentState = (this->value > BouncerConstants::NOISE_TOLERANCE);
         #else
             bool currentState = digitalRead(this->pin);
         #endif
@@ -51,7 +50,7 @@ bool Bouncer::update()
     // Read the state of the switch port into a temporary variable.
     #ifdef ANALOG_PINS
         this->value = analogRead(this->pin);
-        bool currentState = (this->value > NOISE_TOLERANCE);
+        bool currentState = (this->value > BouncerConstants::NOISE_TOLERANCE);
     #else
         bool currentState = digitalRead(this->pin);
     #endif
@@ -82,7 +81,7 @@ bool Bouncer::update()
     // Read the state of the switch in a temporary variable.
     #ifdef ANALOG_PINS
         this->value = analogRead(this->pin);
-        bool currentState = (this->value > NOISE_TOLERANCE);
+        bool currentState = (this->value > BouncerConstants::NOISE_TOLERANCE);
     #else
         bool currentState = digitalRead(this->pin);
     #endif

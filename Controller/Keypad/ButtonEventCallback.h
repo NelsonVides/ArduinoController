@@ -19,8 +19,8 @@ class ButtonEventCallback {
 public:
     ButtonEventCallback();
 
-    EventType getType() const;
-    void setType(EventType type);
+    PushButtonEventsResponse::EventType getType() const;
+    void setType(PushButtonEventsResponse::EventType type);
     void setDelay(uint16_t delay);
     void setMaxDelay(uint16_t max_delay);
     void setRepetitionPeriod(uint16_t repeat_period);
@@ -31,7 +31,7 @@ public:
     void reset();
 
 private:
-    EventType _type = EventType::evtUninitialised;
+    PushButtonEventsResponse::EventType _type = PushButtonEventsResponse::EventType::evtUninitialised;
     uint16_t _delay = 0;
     uint16_t _max_delay = 0;
     uint16_t _repeat_period = 0;
