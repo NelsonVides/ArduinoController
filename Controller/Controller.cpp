@@ -4,24 +4,22 @@
 #include "classes/Thermometer.h"
 #include "Keypad/PushButton.h"
 
-constexpr uint8_t trPin = 0;
+//Thermometer
+constexpr uint8_t trPin = A0;
 Thermometer Therm(trPin);
 
+//LCD
 constexpr uint8_t rs = 7, en = 6, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 LiquidCrystal Lcd(rs, en, d4, d5, d6, d7);
-bool _stateLCD = true;
+//bool _stateLCD = true;
 
-// Create an instance of PushButton reading digital pin 5
+//PushButtons
 PushButton button1 = PushButton(A1);
 PushButton button2 = PushButton(A2);
 PushButton button3 = PushButton(A3);
 PushButton button4 = PushButton(A4);
-// btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
 void onButtonPressed(PushButton& btn);
-// duration reports back how long it has been since the button was originally pressed.
-// repeatCount tells us how many times this function has been called by this button.
 void onButtonHeld(PushButton& btn, uint16_t duration, uint16_t repeatCount);
-// duration reports back the total time that the button was held down
 void onButtonReleased(PushButton& btn, uint16_t duration);
 
 void setup() {
@@ -36,7 +34,7 @@ void setup() {
 	Lcd.setCursor(10, 1);
 
     pinMode(8, OUTPUT);
-    digitalWrite(8,_stateLCD);
+    digitalWrite(8,HIGH);
 
     // When the button is first pressed, call the function onButtonPressed (further down the page)
     button1.onPress(onButtonPressed);

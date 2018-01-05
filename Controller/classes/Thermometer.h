@@ -13,7 +13,6 @@ class Thermometer {
 public:
     explicit Thermometer(uint8_t pin);
     float getCelsius() const;
-    float getFarenheit() const;
     bool isTime();
 
 private:

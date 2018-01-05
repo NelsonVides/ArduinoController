@@ -7,7 +7,10 @@
 #include "Thermometer.h"
 
 namespace {
-    constexpr unsigned long interval = 1000;     // interval at which to blink (milliseconds)
+    constexpr float adjuster = 1023.0 / 5.0;
+    constexpr float multiplier = 100.0;
+    constexpr float celsiometer = 50.0;
+    constexpr unsigned long interval = 1000; //interval at which to blink (milliseconds)
 }
 
 Thermometer::Thermometer(uint8_t pin) :
@@ -18,12 +21,7 @@ Thermometer::Thermometer(uint8_t pin) :
 
 float Thermometer::getCelsius() const
 {
-    return (this->getVoltage() - 32.0) * (5.0 / 9.0);
-}
-
-float Thermometer::getFarenheit() const
-{
-    return this->getVoltage();
+    return (this->getVoltage() * multiplier) - celsiometer;
 }
 
 bool Thermometer::isTime()
@@ -38,5 +36,5 @@ bool Thermometer::isTime()
 
 inline float Thermometer::getVoltage() const
 {
-    return (analogRead(this->_pin) * 500.0) / 1023.0;
+    return analogRead(this->_pin) / adjuster;
 }

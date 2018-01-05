@@ -7,54 +7,100 @@
 #ifndef KEYPADCALLBACKS_H_
 #define KEYPADCALLBACKS_H_
 
-void printButtonNumber(PushButton& btn)
+enum class allButtons {
+    unKnown,
+    S1,    S2,    S3,    S4,
+    S5,    S6,    S7,    S8,
+    S9,    S10,   S11,   S12,
+    S13,   S14,   S15,   S16
+};
+
+allButtons printButtonNumber(PushButton& btn)
 {
     buttonNumber btnNum = btn.getLastPressedButton();
     if (btn.is(button1)) {
-        if (btnNum == buttonNumber::R1)
+        if (btnNum == buttonNumber::R1) {
             Serial.print("Button 1");
-        if (btnNum == buttonNumber::R2)
+            return allButtons::S1;
+        }
+        if (btnNum == buttonNumber::R2) {
             Serial.print("Button 2");
-        if (btnNum == buttonNumber::R3)
+            return allButtons::S2;
+        }
+        if (btnNum == buttonNumber::R3) {
             Serial.print("Button 3");
-        if (btnNum == buttonNumber::R4)
+            return allButtons::S3;
+        }
+        if (btnNum == buttonNumber::R4) {
             Serial.print("Button 4");
+            return allButtons::S4;
+        }
     } else if (btn.is(button2)) {
-        if (btnNum == buttonNumber::R1)
+        if (btnNum == buttonNumber::R1) {
             Serial.print("Button 5");
-        if (btnNum == buttonNumber::R2)
+            return allButtons::S5;
+        }
+        if (btnNum == buttonNumber::R2) {
             Serial.print("Button 6");
-        if (btnNum == buttonNumber::R3)
+            return allButtons::S6;
+        }
+        if (btnNum == buttonNumber::R3) {
             Serial.print("Button 7");
-        if (btnNum == buttonNumber::R4)
+            return allButtons::S7;
+        }
+        if (btnNum == buttonNumber::R4) {
             Serial.print("Button 8");
+            return allButtons::S8;
+        }
     } else if (btn.is(button3)) {
-        if (btnNum == buttonNumber::R1)
+        if (btnNum == buttonNumber::R1) {
             Serial.print("Button 9");
-        if (btnNum == buttonNumber::R2)
+            return allButtons::S9;
+        }
+        if (btnNum == buttonNumber::R2) {
             Serial.print("Button 10");
-        if (btnNum == buttonNumber::R3)
+            return allButtons::S10;
+        }
+        if (btnNum == buttonNumber::R3) {
             Serial.print("Button 11");
-        if (btnNum == buttonNumber::R4)
+            return allButtons::S11;
+        }
+        if (btnNum == buttonNumber::R4) {
             Serial.print("Button 12");
+            return allButtons::S12;
+        }
     } else if (btn.is(button4)) {
-        if (btnNum == buttonNumber::R1)
+        if (btnNum == buttonNumber::R1) {
             Serial.print("Button 13");
-        if (btnNum == buttonNumber::R2)
+            return allButtons::S13;
+        }
+        if (btnNum == buttonNumber::R2) {
             Serial.print("Button 14");
-        if (btnNum == buttonNumber::R3)
+            return allButtons::S14;
+        }
+        if (btnNum == buttonNumber::R3) {
             Serial.print("Button 15");
-        if (btnNum == buttonNumber::R4)
+            return allButtons::S15;
+        }
+        if (btnNum == buttonNumber::R4) {
             Serial.print("Button 16");
+            return allButtons::S16;
+        }
     } else {
         Serial.print("Hmmm, no button was");
     }
+    return allButtons::unKnown;
 }
 
 // btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
 void onButtonPressed(PushButton& btn){
-    printButtonNumber(btn);
+    allButtons bt = printButtonNumber(btn);
     Serial.println(" pressed");
+    if (bt == allButtons::S1) {
+        static bool _stateLCD = true;
+        _stateLCD = !_stateLCD;
+        digitalWrite(8,_stateLCD);
+    }
 }
 
 // duration reports back how long it has been since the button was originally pressed.
