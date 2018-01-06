@@ -3,9 +3,14 @@
  * Created: 18/11/2014 19:33:09
  *  Author: Richard
  */ 
- 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Forked by Nelson Vides to implement ANALOG_PINS
+ * and modern C++ features
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 #include "PushButton.h"
 #include "ButtonEventCallback.h"
+using namespace buttonsMgmt;
 
 // Empty default constructor
 ButtonEventCallback::ButtonEventCallback()

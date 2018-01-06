@@ -9,16 +9,18 @@
 
 #include <Arduino.h>
 
-class Thermometer {
-public:
-    explicit Thermometer(uint8_t pin);
-    float getCelsius() const;
-    bool isTime();
+namespace thermoMgmt {
+    class Thermometer {
+    public:
+        explicit Thermometer(uint8_t pin);
+        float getCelsius() const;
+        bool isTime();
 
-private:
-    const uint8_t _pin;
-    unsigned long _previous_millis = 0;
-    inline float getVoltage() const;
-};
+    private:
+        const uint8_t _pin;
+        unsigned long _previous_millis = 0;
+        inline float getVoltage() const;
+    };
+}
 
 #endif /* CLASSES_THERMOMETER_H_ */

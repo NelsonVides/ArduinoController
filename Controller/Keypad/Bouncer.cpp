@@ -1,8 +1,12 @@
-// Please read Bounce2.h for information about the license and authors
+// Please read Bouncer.h for information about the license and authors
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Forked by Nelson Vides to implement ANALOG_PINS
+ * and modern C++ features
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#include "Arduino.h"
-
+#include <Arduino.h>
 #include "Bouncer.h"
+using namespace buttonsMgmt;
 
 //This is an implementation detail that doesn't need to be seen by the outside world.
 namespace {

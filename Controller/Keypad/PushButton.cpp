@@ -3,15 +3,20 @@
  * Created: 18/11/2014 19:33:23
  *  Author: Richard
  */ 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Forked by Nelson Vides to implement ANALOG_PINS
+ * and modern C++ features
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "PushButton.h"
 #include "ButtonEventCallback.h"
+using namespace buttonsMgmt;
 
 PushButton::PushButton(uint8_t pin)
     : bouncer(Bouncer(pin))
 {}
 
-boolean PushButton::_update_button_state()
+bool PushButton::_update_button_state()
 {
     // Update the button
     bouncer.update();

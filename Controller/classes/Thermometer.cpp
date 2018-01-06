@@ -5,6 +5,7 @@
  */
 
 #include "Thermometer.h"
+using namespace thermoMgmt;
 
 namespace {
     constexpr float adjuster = 1023.0 / 5.0;

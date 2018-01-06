@@ -44,42 +44,43 @@
 
 #include <inttypes.h>
 
-namespace BouncerConstants {
-    constexpr uint16_t NOISE_TOLERANCE = 50;
+namespace buttonsMgmt {
+    namespace BouncerConstants {
+        constexpr uint16_t NOISE_TOLERANCE = 50;
+    }
+
+    class Bouncer {
+    public:
+        // Create an instance of the bounce library
+        explicit Bouncer(uint8_t pin);
+
+        // Updates the pin
+        // Returns whether the state changed or not
+        bool update();
+
+        // Returns the updated pin state
+        bool read() const;
+
+        // Returns the falling pin state
+        bool fell() const;
+
+        // Returns the rising pin state
+        bool rose() const;
+
+    #ifdef ANALOG_PINS
+        // Returns the updated pin value
+        uint16_t getValue() const;
+    #endif
+
+    protected:
+        unsigned long previous_millis = 0;
+        uint16_t interval_millis = 10;
+    #ifdef ANALOG_PINS
+        uint16_t value = 0;
+    #endif
+        uint8_t state = 0;
+        uint8_t pin;
+    };
 }
-
-class Bouncer
-{
-public:
-    // Create an instance of the bounce library
-    explicit Bouncer(uint8_t pin);
-
-    // Updates the pin
-    // Returns whether the state changed or not
-    bool update();
-
-    // Returns the updated pin state
-    bool read() const;
-
-    // Returns the falling pin state
-    bool fell() const;
-
-    // Returns the rising pin state
-    bool rose() const;
-
-#ifdef ANALOG_PINS
-    // Returns the updated pin value
-    uint16_t getValue() const;
-#endif
-
-protected:
-    unsigned long previous_millis = 0;
-    uint16_t interval_millis = 10;
-#ifdef ANALOG_PINS
-    uint16_t value = 0;
-#endif
-    uint8_t state = 0;
-    uint8_t pin;
-};
 
 #endif
