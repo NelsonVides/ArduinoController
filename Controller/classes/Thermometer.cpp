@@ -14,11 +14,11 @@ namespace {
     constexpr unsigned long interval = 1000; //interval at which to blink (milliseconds)
 }
 
-Thermometer::Thermometer(uint8_t pin) :
-    _pin(pin)
+Thermometer::Thermometer(uint8_t pin)
+        : _pin(pin)
 {
-    pinMode(pin,INPUT);
-};
+    pinMode(pin, INPUT);
+}
 
 float Thermometer::getCelsius() const
 {

@@ -24,19 +24,20 @@ namespace buttonsMgmt {
     void onButtonReleased(PushButton& btn, uint16_t duration);
 }
 
-void setup() {
-	Serial.begin(115200);
-	Serial.println("INIT of everything");
+void setup()
+{
+    Serial.begin(115200);
+    Serial.println("INIT of everything");
 
-	LCDMgmt::Lcd.begin(16, 2);
-	LCDMgmt::Lcd.clear();
-	LCDMgmt::Lcd.print("Arduino");
-	LCDMgmt::Lcd.setCursor(2, 1);
-	LCDMgmt::Lcd.print("Celcius ");
-	LCDMgmt::Lcd.setCursor(10, 1);
+    LCDMgmt::Lcd.begin(16, 2);
+    LCDMgmt::Lcd.clear();
+    LCDMgmt::Lcd.print("Arduino");
+    LCDMgmt::Lcd.setCursor(2, 1);
+    LCDMgmt::Lcd.print("Celcius ");
+    LCDMgmt::Lcd.setCursor(10, 1);
 
     pinMode(8, OUTPUT);
-    digitalWrite(8,HIGH);
+    digitalWrite(8, HIGH);
 
     // When the button is first pressed, call the function onButtonPressed (further down the page)
     buttonsMgmt::button1.onPress(buttonsMgmt::onButtonPressed);
@@ -53,17 +54,18 @@ void setup() {
     buttonsMgmt::button4.onRelease(buttonsMgmt::onButtonReleased);
 }
 
-void loop() {
-	if (thermoMgmt::Therm.isTime()) {
-	    LCDMgmt::Lcd.setCursor(10, 1);
-	    LCDMgmt::Lcd.print(thermoMgmt::Therm.getCelsius());
-	}
+void loop()
+{
+    if (thermoMgmt::Therm.isTime()) {
+        LCDMgmt::Lcd.setCursor(10, 1);
+        LCDMgmt::Lcd.print(thermoMgmt::Therm.getCelsius());
+    }
 
     // Update those buttons
-	buttonsMgmt::button1.update();
-	buttonsMgmt::button2.update();
-	buttonsMgmt::button3.update();
-	buttonsMgmt::button4.update();
+    buttonsMgmt::button1.update();
+    buttonsMgmt::button2.update();
+    buttonsMgmt::button3.update();
+    buttonsMgmt::button4.update();
 }
 
 #include "KeypadCallbacks.h"

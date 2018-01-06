@@ -10,10 +10,22 @@
 namespace buttonsMgmt {
     enum class allButtons {
         unKnown,
-        S1,    S2,    S3,    S4,
-        S5,    S6,    S7,    S8,
-        S9,    S10,   S11,   S12,
-        S13,   S14,   S15,   S16
+        S1,
+        S2,
+        S3,
+        S4,
+        S5,
+        S6,
+        S7,
+        S8,
+        S9,
+        S10,
+        S11,
+        S12,
+        S13,
+        S14,
+        S15,
+        S16
     };
 
     allButtons printButtonNumber(PushButton& btn)
@@ -94,28 +106,31 @@ namespace buttonsMgmt {
     }
 
     // btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
-    void onButtonPressed(PushButton& btn){
+    void onButtonPressed(PushButton& btn)
+    {
         allButtons bt = printButtonNumber(btn);
         Serial.println(" pressed");
         if (bt == allButtons::S1) {
             static bool _stateLCD = true;
             _stateLCD = !_stateLCD;
-            digitalWrite(8,_stateLCD);
+            digitalWrite(8, _stateLCD);
         }
     }
 
     // duration reports back how long it has been since the button was originally pressed.
     // repeatCount tells us how many times this function has been called by this button.
-    void onButtonHeld(PushButton& btn, uint16_t duration, uint16_t repeatCount){
-            Serial.print("button has been held for ");
-            Serial.print(duration);
-            Serial.print(" ms; this event has been fired ");
-            Serial.print(repeatCount);
-            Serial.println(" times");
+    void onButtonHeld(PushButton& btn, uint16_t duration, uint16_t repeatCount)
+    {
+        Serial.print("button has been held for ");
+        Serial.print(duration);
+        Serial.print(" ms; this event has been fired ");
+        Serial.print(repeatCount);
+        Serial.println(" times");
     }
 
     // duration reports back the total time that the button was held down
-    void onButtonReleased(PushButton& btn, uint16_t duration){
+    void onButtonReleased(PushButton& btn, uint16_t duration)
+    {
         printButtonNumber(btn);
         Serial.print(" released after ");
         Serial.print(duration);

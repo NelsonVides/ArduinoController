@@ -2,7 +2,7 @@
  * Button.h
  * Created: 18/11/2014 19:33:02
  *  Author: Richard
- */ 
+ */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * Forked by Nelson Vides to implement ANALOG_PINS
  * and modern C++ features
@@ -26,13 +26,16 @@ namespace buttonsMgmt {
         void setMaxDelay(uint16_t max_delay);
         void setRepetitionPeriod(uint16_t repeat_period);
         void setCallback(ButtonOnEventCallback callback);
-        void setRepeatingCallback(ButtonOnEventRepeatCallback callback_repeating);
+        void setRepeatingCallback(
+                ButtonOnEventRepeatCallback callback_repeating);
 
-        void executeCallbackIfTime(uint16_t elapsedTime, bool release_event, PushButton& btn);
+        void executeCallbackIfTime(uint16_t elapsedTime, bool release_event,
+                PushButton& btn);
         void reset();
 
     private:
-        PushButtonEventsResponse::EventType _type = PushButtonEventsResponse::EventType::evtUninitialised;
+        PushButtonEventsResponse::EventType _type =
+                PushButtonEventsResponse::EventType::evtUninitialised;
         uint16_t _delay = 0;
         uint16_t _max_delay = 0;
         uint16_t _repeat_period = 0;
