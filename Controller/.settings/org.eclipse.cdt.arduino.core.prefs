@@ -1,2 +1,2 @@
 eclipse.preferences.version=1
-libraries=["Sim800L Library Revised",{"package"\:"arduino","platform"\:"avr","library"\:"SPI"},"LiquidCrystal",{"package"\:"arduino","platform"\:"avr","library"\:"SoftwareSerial"}]
+libraries=["Time","LiquidCrystal","Chronos"]

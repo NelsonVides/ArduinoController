@@ -11,13 +11,12 @@ namespace {
     constexpr float adjuster = 1023.0 / 5.0;
     constexpr float multiplier = 100.0;
     constexpr float celsiometer = 50.0;
-    constexpr unsigned long interval = 1000; //interval at which to blink (milliseconds)
+    constexpr unsigned long interval = 1500; //interval at which to blink (milliseconds)
 }
 
 Thermometer::Thermometer(uint8_t pin)
         : _pin(pin)
 {
-    pinMode(pin, INPUT);
 }
 
 float Thermometer::getCelsius() const

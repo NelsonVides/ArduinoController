@@ -18,11 +18,7 @@ namespace {
 Bouncer::Bouncer(uint8_t pin) :
       pin(pin)
 {
-    pinMode(pin, INPUT);
     this->pin = pin;
-    if (digitalRead(pin)) {
-        state = DEBOUNCED_STATE | UNSTABLE_STATE;
-    }
     #ifdef BOUNCE_LOCK_OUT
         this->previous_millis = 0;
     #else
@@ -35,20 +31,20 @@ bool Bouncer::update()
 #ifdef BOUNCE_LOCK_OUT
     state &= ~STATE_CHANGED;
     // Ignore everything if we are locked out
-    if (millis() - previous_millis >= interval_millis) {
+    if (millis() - this->previous_millis >= this->interval_millis) {
         #ifdef ANALOG_PINS
             this->value = analogRead(this->pin);
             bool currentState = (this->value > BouncerConstants::NOISE_TOLERANCE);
         #else
             bool currentState = digitalRead(this->pin);
         #endif
-        if ((bool)(state & DEBOUNCED_STATE) != currentState) {
-            previous_millis = millis();
-            state ^= DEBOUNCED_STATE;
-            state |= STATE_CHANGED;
+        if ((bool)(this->state & DEBOUNCED_STATE) != currentState) {
+            this->previous_millis = millis();
+            this->state ^= DEBOUNCED_STATE;
+            this->state |= STATE_CHANGED;
         }
     }
-    return state & STATE_CHANGED;
+    return this->state & STATE_CHANGED;
 
 #elif defined BOUNCE_WITH_PROMPT_DETECTION
     // Read the state of the switch port into a temporary variable.
@@ -59,28 +55,28 @@ bool Bouncer::update()
         bool currentState = digitalRead(this->pin);
     #endif
     // Clear Changed State Flag - will be reset if we confirm a button state change.
-    state &= ~STATE_CHANGED;
+    this->state &= ~STATE_CHANGED;
 
-    if (currentState != (bool)(state & DEBOUNCED_STATE)) {
+    if (currentState != (bool)(this->state & DEBOUNCED_STATE)) {
         // We have seen a change from the current button state.
-        if ( millis() - previous_millis >= interval_millis ) {
+        if (millis() - this->previous_millis >= this->interval_millis ) {
             // We have passed the time threshold, so a new change of state is allowed.
             // set the STATE_CHANGED flag and the new DEBOUNCED_STATE.
             // This will be prompt as long as there has been greater than interval_misllis ms since last change of input.
             // Otherwise debounced state will not change again until bouncing is stable for the timeout period.
-            state ^= DEBOUNCED_STATE;
-            state |= STATE_CHANGED;
+            this->state ^= DEBOUNCED_STATE;
+            this->state |= STATE_CHANGED;
         }
     }
     // If the currentState is different from previous currentState, reset the debounce timer - as input is still unstable
     // and we want to prevent new button state changes until the previous one has remained stable for the timeout.
-    if (currentState != (bool)(state & UNSTABLE_STATE) ) {
+    if (currentState != (bool)(this->state & UNSTABLE_STATE) ) {
         // Update Unstable Bit to macth currentState
-        state ^= UNSTABLE_STATE;
-        previous_millis = millis();
+        this->state ^= UNSTABLE_STATE;
+        this->previous_millis = millis();
     }
     // return just the sate changed bit
-    return state & STATE_CHANGED;
+    return this->state & STATE_CHANGED;
 #else
     // Read the state of the switch in a temporary variable.
     #ifdef ANALOG_PINS
@@ -89,39 +85,39 @@ bool Bouncer::update()
     #else
         bool currentState = digitalRead(this->pin);
     #endif
-    state &= ~STATE_CHANGED; ///reset STATE_CHANGED flag
+    this->state &= ~STATE_CHANGED; ///reset STATE_CHANGED flag
 
     // If the reading is different from last reading, reset the debounce counter
-    if (currentState != (bool)(state & UNSTABLE_STATE)) { /// PRESSED_STATE != UNSTABLE_STATE
-        previous_millis = millis();
-        state ^= UNSTABLE_STATE; ///XOR-on the UNSTABLE_STATE, reset all other flags
+    if (currentState != (bool)(this->state & UNSTABLE_STATE)) { /// PRESSED_STATE != UNSTABLE_STATE
+        this->previous_millis = millis();
+        this->state ^= UNSTABLE_STATE; ///XOR-on the UNSTABLE_STATE, reset all other flags
     }
-    if (millis() - previous_millis >= interval_millis) { ///if enough time has passed
+    if (millis() - this->previous_millis >= this->interval_millis) { ///if enough time has passed
         // We have passed the threshold time, so the input is now stable
         // If it is different from last state, set the STATE_CHANGED flag
-        if (currentState != (bool)(state & DEBOUNCED_STATE)) { ///PRESSED_STATE != DEBOUNCED_STATE
-            previous_millis = millis();
-            state ^= DEBOUNCED_STATE; /// XOR 0001 =>
-            state |= STATE_CHANGED;   /// iOR 1000 => turn on the STATE_CHANGED flag
+        if (currentState != (bool)(this->state & DEBOUNCED_STATE)) { ///PRESSED_STATE != DEBOUNCED_STATE
+            this->previous_millis = millis();
+            this->state ^= DEBOUNCED_STATE; /// XOR 0001 =>
+            this->state |= STATE_CHANGED;   /// iOR 1000 => turn on the STATE_CHANGED flag
         }
     }
-    return state & STATE_CHANGED; // return STATE_CHANGED flag
+    return this->state & STATE_CHANGED; // return STATE_CHANGED flag
 #endif
 }
 
 bool Bouncer::read() const ///return if DEBOUNCED
 {
-    return (state & DEBOUNCED_STATE);
+    return (this->state & DEBOUNCED_STATE);
 }
 
 bool Bouncer::rose() const ///return if DEBOUNCED and CHANGED
 {
-    return (state & DEBOUNCED_STATE) && (state & STATE_CHANGED);
+    return (this->state & DEBOUNCED_STATE) && (this->state & STATE_CHANGED);
 }
 
 bool Bouncer::fell() const ///return if !DEBOUNCED or !CHANGED
 {
-    return !rose();
+    return !this->rose();
 }
 
 #ifdef ANALOG_PINS

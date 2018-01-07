@@ -6,19 +6,19 @@
 
 namespace thermoMgmt {
     constexpr uint8_t trPin = A0;
-    Thermometer Therm(trPin);
+    static Thermometer Therm(trPin);
 }
 
 namespace LCDMgmt {
     constexpr uint8_t rs = 7, en = 6, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
-    LiquidCrystal Lcd(rs, en, d4, d5, d6, d7);
+    static LiquidCrystal Lcd(rs, en, d4, d5, d6, d7);
 }
 
 namespace buttonsMgmt {
-    PushButton button1 = PushButton(A1);
-    PushButton button2 = PushButton(A2);
-    PushButton button3 = PushButton(A3);
-    PushButton button4 = PushButton(A4);
+    static PushButton button1 = PushButton(A1);
+    static PushButton button2 = PushButton(A2);
+    static PushButton button3 = PushButton(A3);
+    static PushButton button4 = PushButton(A4);
     void onButtonPressed(PushButton& btn);
     void onButtonHeld(PushButton& btn, uint16_t duration, uint16_t repeatCount);
     void onButtonReleased(PushButton& btn, uint16_t duration);
