@@ -10,22 +10,10 @@
 namespace buttonsMgmt {
     enum class allButtons {
         unKnown,
-        S1,
-        S2,
-        S3,
-        S4,
-        S5,
-        S6,
-        S7,
-        S8,
-        S9,
-        S10,
-        S11,
-        S12,
-        S13,
-        S14,
-        S15,
-        S16
+        S1,        S2,        S3,        S4,
+        S5,        S6,        S7,        S8,
+        S9,        S10,       S11,       S12,
+        S13,       S14,       S15,       S16
     };
 
     allButtons printButtonNumber(PushButton& btn)
@@ -105,15 +93,21 @@ namespace buttonsMgmt {
         return allButtons::unKnown;
     }
 
+    void switchPowerLCD()
+    {
+        static bool _stateLCD = true;
+        _stateLCD = !_stateLCD;
+        LCDMgmt::Lcd.setBacklight(_stateLCD);
+        //digitalWrite(8, _stateLCD);
+    }
+
     // btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
     void onButtonPressed(PushButton& btn)
     {
         allButtons bt = printButtonNumber(btn);
         Serial.println(" pressed");
         if (bt == allButtons::S1) {
-            static bool _stateLCD = true;
-            _stateLCD = !_stateLCD;
-            digitalWrite(8, _stateLCD);
+            switchPowerLCD();
         }
     }
 

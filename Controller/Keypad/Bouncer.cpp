@@ -18,7 +18,6 @@ namespace {
 Bouncer::Bouncer(uint8_t pin) :
       pin(pin)
 {
-    this->pin = pin;
     #ifdef BOUNCE_LOCK_OUT
         this->previous_millis = 0;
     #else
@@ -80,6 +79,7 @@ bool Bouncer::update()
 #else
     // Read the state of the switch in a temporary variable.
     #ifdef ANALOG_PINS
+    //TODO: this->value = (this->value - analog) ? analog : this->value;
         this->value = analogRead(this->pin);
         bool currentState = (this->value > BouncerConstants::NOISE_TOLERANCE);
     #else

@@ -1,24 +1,41 @@
 #include <Arduino.h>
-#include <LiquidCrystal.h>
+#include <Wire.h>
 
+#include "LCD/LiquidCrystal_I2C.h"
 #include "classes/Thermometer.h"
 #include "Keypad/PushButton.h"
 
+/*
+ * TODO's:
+ *      implement LCD backlight dimming
+ *      new thermometer with its other forecasting
+ *      connect the GSM and program it
+ *      radio receiver and tinyBrd
+ */
+
+namespace pins {
+    constexpr uint8_t btn1 = A0;
+    constexpr uint8_t btn2 = A1;
+    constexpr uint8_t btn3 = A2;
+    constexpr uint8_t btn4 = A3;
+    constexpr uint8_t lcdBckLight = 3; //TODO: implement backlight dimming. Three levels for example (on/mid/off)
+
+}
+
 namespace thermoMgmt {
-    constexpr uint8_t trPin = A0;
-    static Thermometer Therm(trPin);
+    //constexpr uint8_t trPin = A0;
+    //static Thermometer Therm(trPin);
 }
 
 namespace LCDMgmt {
-    constexpr uint8_t rs = 7, en = 6, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
-    static LiquidCrystal Lcd(rs, en, d4, d5, d6, d7);
+    LiquidCrystal_I2C Lcd(0x27, 2, 1, 0, 4, 5, 6, 7, pins::lcdBckLight, t_backlightPol::POSITIVE);
 }
 
 namespace buttonsMgmt {
-    static PushButton button1 = PushButton(A1);
-    static PushButton button2 = PushButton(A2);
-    static PushButton button3 = PushButton(A3);
-    static PushButton button4 = PushButton(A4);
+    static PushButton button1 = PushButton(pins::btn1);
+    static PushButton button2 = PushButton(pins::btn2);
+    static PushButton button3 = PushButton(pins::btn3);
+    static PushButton button4 = PushButton(pins::btn4);
     void onButtonPressed(PushButton& btn);
     void onButtonHeld(PushButton& btn, uint16_t duration, uint16_t repeatCount);
     void onButtonReleased(PushButton& btn, uint16_t duration);
@@ -29,15 +46,12 @@ void setup()
     Serial.begin(115200);
     Serial.println("INIT of everything");
 
-    LCDMgmt::Lcd.begin(16, 2);
+    LCDMgmt::Lcd.begin(16, 2, LCD_5x8DOTS);
     LCDMgmt::Lcd.clear();
     LCDMgmt::Lcd.print("Arduino");
     LCDMgmt::Lcd.setCursor(2, 1);
     LCDMgmt::Lcd.print("Celcius ");
     LCDMgmt::Lcd.setCursor(10, 1);
-
-    pinMode(8, OUTPUT);
-    digitalWrite(8, HIGH);
 
     // When the button is first pressed, call the function onButtonPressed (further down the page)
     buttonsMgmt::button1.onPress(buttonsMgmt::onButtonPressed);
@@ -56,10 +70,10 @@ void setup()
 
 void loop()
 {
-    if (thermoMgmt::Therm.isTime()) {
-        LCDMgmt::Lcd.setCursor(10, 1);
-        LCDMgmt::Lcd.print(thermoMgmt::Therm.getCelsius());
-    }
+    //if (thermoMgmt::Therm.isTime()) {
+        //LCDMgmt::Lcd.setCursor(10, 1);
+        //LCDMgmt::Lcd.print(thermoMgmt::Therm.getCelsius());
+    //}
 
     // Update those buttons
     buttonsMgmt::button1.update();

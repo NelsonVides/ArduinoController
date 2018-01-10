@@ -1,2 +1,2 @@
 eclipse.preferences.version=1
-libraries=["Time","LiquidCrystal","Chronos"]
+libraries=[{"package"\:"arduino","platform"\:"avr","library"\:"Wire"}]

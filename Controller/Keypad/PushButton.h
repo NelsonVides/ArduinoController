@@ -51,7 +51,7 @@ namespace buttonsMgmt {
 namespace buttonsMgmt {
     class PushButton {
     public:
-        PushButton(uint8_t pin);
+        explicit PushButton(uint8_t pin);
 
         /// ButtonOnPressCallback is a function which will be called as soon as the button is pressed.
         /// It must be defined with the parameters shown below
