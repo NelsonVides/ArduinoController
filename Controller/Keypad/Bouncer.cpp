@@ -33,7 +33,7 @@ bool Bouncer::update()
     if (millis() - this->previous_millis >= this->interval_millis) {
         #ifdef ANALOG_PINS
             this->value = analogRead(this->pin);
-            bool currentState = (this->value > BouncerConstants::NOISE_TOLERANCE);
+            bool currentState = (this->value > BouncerConsts::NOISE_TOLL);
         #else
             bool currentState = digitalRead(this->pin);
         #endif
@@ -49,7 +49,7 @@ bool Bouncer::update()
     // Read the state of the switch port into a temporary variable.
     #ifdef ANALOG_PINS
         this->value = analogRead(this->pin);
-        bool currentState = (this->value > BouncerConstants::NOISE_TOLERANCE);
+        bool currentState = (this->value > BouncerConsts::NOISE_TOLL);
     #else
         bool currentState = digitalRead(this->pin);
     #endif
@@ -79,9 +79,8 @@ bool Bouncer::update()
 #else
     // Read the state of the switch in a temporary variable.
     #ifdef ANALOG_PINS
-    //TODO: this->value = (this->value - analog) ? analog : this->value;
         this->value = analogRead(this->pin);
-        bool currentState = (this->value > BouncerConstants::NOISE_TOLERANCE);
+        bool currentState = (this->value > BouncerConsts::NOISE_TOLL);
     #else
         bool currentState = digitalRead(this->pin);
     #endif
@@ -121,7 +120,7 @@ bool Bouncer::fell() const ///return if !DEBOUNCED or !CHANGED
 }
 
 #ifdef ANALOG_PINS
-uint16_t Bouncer::getValue() const {
+int Bouncer::getValue() const {
     return this->value;
 }
 #endif

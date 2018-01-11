@@ -92,6 +92,7 @@ constexpr uint8_t D6 = 2;
 constexpr uint8_t D7 = 3;
 }
 
+using namespace LiquidCrystal;
 // CONSTRUCTORS
 // ---------------------------------------------------------------------------
 LiquidCrystal_I2C::LiquidCrystal_I2C( uint8_t lcd_Addr )

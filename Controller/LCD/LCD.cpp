@@ -45,7 +45,7 @@
 //extern "C" void __cxa_pure_virtual() { while (1); }
 #include "../LCD/LCD.h"
 
-
+using namespace LiquidCrystal;
 // CLASS CONSTRUCTORS
 // ---------------------------------------------------------------------------
 // Constructor

@@ -25,30 +25,9 @@ bool PushButton::_update_button_state()
     return bouncer.read();
 }
 
-buttonNumber PushButton::getLastPressedButton()
+int16_t PushButton::getAnalogValue()
 {
-    uint16_t internalValue = this->bouncer.getValue();
-    if (internalValue < BouncerConstants::NOISE_TOLERANCE) {
-        return this->_last_button_pressed;
-    } else {
-        if (internalValue > 100 && internalValue < 300) {
-            this->_last_button_pressed = buttonNumber::R1;
-            return buttonNumber::R1;
-        }
-        if (internalValue > 300 && internalValue < 550) {
-            this->_last_button_pressed = buttonNumber::R2;
-            return buttonNumber::R2;
-        }
-        if (internalValue > 550 && internalValue < 800) {
-            this->_last_button_pressed = buttonNumber::R3;
-            return buttonNumber::R3;
-        }
-        if (internalValue > 960) {
-            this->_last_button_pressed = buttonNumber::R4;
-            return buttonNumber::R4;
-        }
-        return buttonNumber::btnUnkown;
-    }
+    return this->bouncer.getValue();
 }
 
 void PushButton::_button_pressed()

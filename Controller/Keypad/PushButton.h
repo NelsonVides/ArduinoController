@@ -32,11 +32,6 @@ namespace buttonsMgmt {
             attSuccessful, attNoMoreRoom
         };
     }
-
-    enum class buttonNumber
-        : uint8_t {
-            btnUnkown, R1, R2, R3, R4
-    };
 }
 
 /* There is a circular dependency on these two libraries, so this should not be removed
@@ -95,13 +90,12 @@ namespace buttonsMgmt {
         bool isPressed() const;
 
         /// Returns the buttonNumber in this pin.
-        buttonNumber getLastPressedButton();
+        int16_t getAnalogValue();
 
     protected:
         bool _update_button_state();
 
     private:
-        buttonNumber _last_button_pressed = buttonNumber::btnUnkown;
         Bouncer bouncer;
         uint32_t _button_pressed_timestamp = 0; // When the button was originally pressed
         bool _is_pressed = false; // Whether or not the button is currently pressed

@@ -7,7 +7,6 @@
 
 /*
  * TODO's:
- *      implement LCD backlight dimming
  *      new thermometer with its other forecasting
  *      connect the GSM and program it
  *      radio receiver and tinyBrd
@@ -18,8 +17,7 @@ namespace pins {
     constexpr uint8_t btn2 = A1;
     constexpr uint8_t btn3 = A2;
     constexpr uint8_t btn4 = A3;
-    constexpr uint8_t lcdBckLight = 3; //TODO: implement backlight dimming. Three levels for example (on/mid/off)
-
+    constexpr uint8_t lcdBckLight = 3;
 }
 
 namespace thermoMgmt {
@@ -28,7 +26,7 @@ namespace thermoMgmt {
 }
 
 namespace LCDMgmt {
-    LiquidCrystal_I2C Lcd(0x27, 2, 1, 0, 4, 5, 6, 7, pins::lcdBckLight, t_backlightPol::POSITIVE);
+    LiquidCrystal::LiquidCrystal_I2C Lcd(0x27, 2, 1, 0, 4, 5, 6, 7, pins::lcdBckLight, LiquidCrystal::t_backlightPol::POSITIVE);
 }
 
 namespace buttonsMgmt {
@@ -46,7 +44,7 @@ void setup()
     Serial.begin(115200);
     Serial.println("INIT of everything");
 
-    LCDMgmt::Lcd.begin(16, 2, LCD_5x8DOTS);
+    LCDMgmt::Lcd.begin(16, 2, LiquidCrystal::LCD_5x8DOTS);
     LCDMgmt::Lcd.clear();
     LCDMgmt::Lcd.print("Arduino");
     LCDMgmt::Lcd.setCursor(2, 1);
@@ -66,6 +64,7 @@ void setup()
     buttonsMgmt::button2.onRelease(buttonsMgmt::onButtonReleased);
     buttonsMgmt::button3.onRelease(buttonsMgmt::onButtonReleased);
     buttonsMgmt::button4.onRelease(buttonsMgmt::onButtonReleased);
+    pinMode(pins::lcdBckLight, OUTPUT);
 }
 
 void loop()

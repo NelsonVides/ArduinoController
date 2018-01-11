@@ -18,87 +18,99 @@ namespace buttonsMgmt {
 
     allButtons printButtonNumber(PushButton& btn)
     {
-        buttonNumber btnNum = btn.getLastPressedButton();
+        static int16_t theLast = 0;
+        int16_t btnNum = btn.getAnalogValue();
+        if (btnNum < BouncerConsts::NOISE_TOLL) {
+            btnNum = theLast;
+        } else {
+            theLast = btnNum;
+        }
         if (btn.is(button1)) {
-            if (btnNum == buttonNumber::R1) {
+            if (180 < btnNum && btnNum < 220) {
                 Serial.print("Button 1");
                 return allButtons::S1;
             }
-            if (btnNum == buttonNumber::R2) {
+            if (380 < btnNum && btnNum < 420) {
                 Serial.print("Button 2");
                 return allButtons::S2;
             }
-            if (btnNum == buttonNumber::R3) {
+            if (580 < btnNum && btnNum < 620) {
                 Serial.print("Button 3");
                 return allButtons::S3;
             }
-            if (btnNum == buttonNumber::R4) {
+            if (780 < btnNum && btnNum < 820) {
                 Serial.print("Button 4");
                 return allButtons::S4;
             }
         } else if (btn.is(button2)) {
-            if (btnNum == buttonNumber::R1) {
+            if (180 < btnNum && btnNum < 220) {
                 Serial.print("Button 5");
                 return allButtons::S5;
             }
-            if (btnNum == buttonNumber::R2) {
+            if (380 < btnNum && btnNum < 420) {
                 Serial.print("Button 6");
                 return allButtons::S6;
             }
-            if (btnNum == buttonNumber::R3) {
+            if (580 < btnNum && btnNum < 620) {
                 Serial.print("Button 7");
                 return allButtons::S7;
             }
-            if (btnNum == buttonNumber::R4) {
+            if (780 < btnNum && btnNum < 820) {
                 Serial.print("Button 8");
                 return allButtons::S8;
             }
         } else if (btn.is(button3)) {
-            if (btnNum == buttonNumber::R1) {
+            if (180 < btnNum && btnNum < 220) {
                 Serial.print("Button 9");
                 return allButtons::S9;
             }
-            if (btnNum == buttonNumber::R2) {
+            if (380 < btnNum && btnNum < 420) {
                 Serial.print("Button 10");
                 return allButtons::S10;
             }
-            if (btnNum == buttonNumber::R3) {
+            if (580 < btnNum && btnNum < 620) {
                 Serial.print("Button 11");
                 return allButtons::S11;
             }
-            if (btnNum == buttonNumber::R4) {
+            if (780 < btnNum && btnNum < 820) {
                 Serial.print("Button 12");
                 return allButtons::S12;
             }
         } else if (btn.is(button4)) {
-            if (btnNum == buttonNumber::R1) {
+            if (180 < btnNum && btnNum < 220) {
                 Serial.print("Button 13");
                 return allButtons::S13;
             }
-            if (btnNum == buttonNumber::R2) {
+            if (380 < btnNum && btnNum < 420) {
                 Serial.print("Button 14");
                 return allButtons::S14;
             }
-            if (btnNum == buttonNumber::R3) {
+            if (580 < btnNum && btnNum < 620) {
                 Serial.print("Button 15");
                 return allButtons::S15;
             }
-            if (btnNum == buttonNumber::R4) {
+            if (780 < btnNum && btnNum < 820) {
                 Serial.print("Button 16");
                 return allButtons::S16;
             }
-        } else {
-            Serial.print("Hmmm, no button was");
         }
+        Serial.print("Hmmm, no button was");
         return allButtons::unKnown;
     }
 
     void switchPowerLCD()
     {
-        static bool _stateLCD = true;
-        _stateLCD = !_stateLCD;
-        LCDMgmt::Lcd.setBacklight(_stateLCD);
-        //digitalWrite(8, _stateLCD);
+        static uint8_t _stateLCD = 255;
+        if (_stateLCD == 255) {
+            _stateLCD = 128;
+        } else if (_stateLCD == 128) {
+            _stateLCD = 16;
+        } else if (_stateLCD == 16) {
+            _stateLCD = 0;
+        } else {
+            _stateLCD = 255;
+        }
+        analogWrite(pins::lcdBckLight,_stateLCD);
     }
 
     // btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons

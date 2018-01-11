@@ -37,7 +37,7 @@
  @discussion  Library driver to control PCF8574 based ASICs. Implementing
  library calls to set/get port through I2C bus.
  */
-
+namespace I2 {
 class I2CIO  
 {
 public:
@@ -154,5 +154,5 @@ private:
    bool isAvailable (uint8_t i2cAddr);
    
 };
-
+}
 #endif

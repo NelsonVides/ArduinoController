@@ -61,9 +61,6 @@
     result into the code. Thus, there is no run-time overhead when using
     _BV().
 */
-#ifndef _BV    
-#define _BV(bit) (1 << (bit))
-#endif
 
 /*!
  @defined 
@@ -101,6 +98,7 @@ inline static void waitUsec ( uint16_t uSec )
  @discussion All these definitions are for driver implementation only and
  shouldn't be used by applications.
  */
+namespace LiquidCrystal {
 // LCD Commands
 // ---------------------------------------------------------------------------
 constexpr uint8_t LCD_CLEARDISPLAY        = 0x01;
@@ -576,5 +574,5 @@ private:
 #endif
    
 };
-
+}
 #endif
