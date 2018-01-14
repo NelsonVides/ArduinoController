@@ -1,9 +1,12 @@
 #include <Arduino.h>
 #include <Wire.h>
+#include <Time.h>
+#include <Chronos.h>
 
 #include "LCD/LiquidCrystal_I2C.h"
-#include "classes/Thermometer.h"
 #include "Keypad/PushButton.h"
+#include "Weather/BME280I2C.h"
+//#include "Chronos/TimeProvider.h"
 
 /*
  * TODO's:
@@ -13,6 +16,7 @@
  */
 
 namespace pins {
+    constexpr auto SerialBaudRate = 115200;
     constexpr uint8_t btn1 = A0;
     constexpr uint8_t btn2 = A1;
     constexpr uint8_t btn3 = A2;
@@ -22,11 +26,20 @@ namespace pins {
 
 namespace thermoMgmt {
     //constexpr uint8_t trPin = A0;
-    //static Thermometer Therm(trPin);
+    static Weather::BME280I2C::Settings SettingsBME(
+            Weather::BME280I2C::OSR::OSR_X1,
+            Weather::BME280I2C::OSR::OSR_X1,
+            Weather::BME280I2C::OSR::OSR_X1,
+            Weather::BME280I2C::Mode::Mode_Forced,
+            Weather::BME280I2C::StandbyTime::StandbyTime_1000ms,
+            Weather::BME280I2C::Filter::Filter_16,
+            Weather::BME280I2C::SpiEnable::SpiEnable_False,
+            Weather::BME280I2C::I2CAddr_0x76);
+    static Weather::BME280I2C Therm(SettingsBME);
 }
 
 namespace LCDMgmt {
-    LiquidCrystal::LiquidCrystal_I2C Lcd(0x27, 2, 1, 0, 4, 5, 6, 7, pins::lcdBckLight, LiquidCrystal::t_backlightPol::POSITIVE);
+    LiquidCrystal::LiquidCrystal_I2C Lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, LiquidCrystal::t_backlightPol::POSITIVE);
 }
 
 namespace buttonsMgmt {
@@ -39,9 +52,25 @@ namespace buttonsMgmt {
     void onButtonReleased(PushButton& btn, uint16_t duration);
 }
 
+namespace timeMgmt {
+    unsigned long interval = 10000;
+    bool isTime() {
+        static unsigned long _previousMillis;
+        unsigned long currentMillis = millis();
+        if (currentMillis - _previousMillis >= interval) {
+            _previousMillis = currentMillis;
+            return true;
+        }
+        return false;
+    }
+    //Chronos::TimeProvider timeProvider;
+}
+
 void setup()
 {
-    Serial.begin(115200);
+    Serial.begin(pins::SerialBaudRate);
+    Wire.begin();
+
     Serial.println("INIT of everything");
 
     LCDMgmt::Lcd.begin(16, 2, LiquidCrystal::LCD_5x8DOTS);
@@ -65,14 +94,34 @@ void setup()
     buttonsMgmt::button3.onRelease(buttonsMgmt::onButtonReleased);
     buttonsMgmt::button4.onRelease(buttonsMgmt::onButtonReleased);
     pinMode(pins::lcdBckLight, OUTPUT);
+    analogWrite(pins::lcdBckLight, HIGH);
+
+    while(!thermoMgmt::Therm.begin()) {
+        delay(1000);
+    }
 }
 
 void loop()
 {
-    //if (thermoMgmt::Therm.isTime()) {
-        //LCDMgmt::Lcd.setCursor(10, 1);
-        //LCDMgmt::Lcd.print(thermoMgmt::Therm.getCelsius());
-    //}
+    if (timeMgmt::isTime()) {
+        LCDMgmt::Lcd.setCursor(10, 1);
+        float temp(NAN), hum(NAN), pres(NAN);
+
+        Weather::BME280::TempUnit tempUnit(Weather::BME280::TempUnit::TempUnit_Celsius);
+        Weather::BME280::PresUnit presUnit(Weather::BME280::PresUnit::PresUnit_Pa);
+        thermoMgmt::Therm.read(pres, temp, hum, tempUnit, presUnit);
+        LCDMgmt::Lcd.print(temp);
+
+        Serial.print("Temp: ");
+        Serial.print(temp);
+        Serial.print("°C");
+        Serial.print("\t\tHumidity: ");
+        Serial.print(hum);
+        Serial.print("% RH");
+        Serial.print("\t\tPressure: ");
+        Serial.print(pres);
+        Serial.println("Pa");
+    }
 
     // Update those buttons
     buttonsMgmt::button1.update();
