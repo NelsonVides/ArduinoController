@@ -58,9 +58,9 @@ bool BME280I2C::WriteRegister(uint8_t addr, uint8_t data)
     Wire.beginTransmission(m_settings.bme280Addr);
     Wire.write(addr);
     Wire.write(data);
-    Wire.endTransmission();
+    uint8_t successWire = Wire.endTransmission();
 
-    return true; // TODO: Chech return values from wire calls.
+    return (successWire == 0); // TODO: Check return values from wire calls.
 }
 
 /****************************************************************/

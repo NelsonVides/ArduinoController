@@ -8,6 +8,10 @@
 #define KEYPADCALLBACKS_H_
 
 namespace buttonsMgmt {
+    static PushButton button1 = PushButton(pins::btn1);
+    static PushButton button2 = PushButton(pins::btn2);
+    static PushButton button3 = PushButton(pins::btn3);
+    static PushButton button4 = PushButton(pins::btn4);
     enum class allButtons {
         unKnown,
         S1,        S2,        S3,        S4,

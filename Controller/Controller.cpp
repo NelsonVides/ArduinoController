@@ -7,11 +7,10 @@
 #include "Keypad/PushButton.h"
 #include "Weather/BME280I2C.h"
 //#include "Chronos/TimeProvider.h"
-
-/*
- * TODO's:
- *      new thermometer with its other forecasting
- *      connect the GSM and program it
+/* TODO's:
+ *      going well: new thermometer with its other forecasting
+ *      next! connect the GSM and program it
+ *      Calendars
  *      radio receiver and tinyBrd
  */
 
@@ -24,15 +23,16 @@ namespace pins {
     constexpr uint8_t lcdBckLight = 3;
 }
 
-namespace thermoMgmt {
-    //constexpr uint8_t trPin = A0;
-    static Weather::BME280I2C::Settings SettingsBME(
+#include "KeypadCallbacks.h"
+
+namespace Weather {
+    Weather::BME280I2C::Settings SettingsBME(
             Weather::BME280I2C::OSR::OSR_X1,
             Weather::BME280I2C::OSR::OSR_X1,
             Weather::BME280I2C::OSR::OSR_X1,
             Weather::BME280I2C::Mode::Mode_Forced,
             Weather::BME280I2C::StandbyTime::StandbyTime_1000ms,
-            Weather::BME280I2C::Filter::Filter_16,
+            Weather::BME280I2C::Filter::Filter_Off,
             Weather::BME280I2C::SpiEnable::SpiEnable_False,
             Weather::BME280I2C::I2CAddr_0x76);
     static Weather::BME280I2C Therm(SettingsBME);
@@ -40,16 +40,6 @@ namespace thermoMgmt {
 
 namespace LCDMgmt {
     LiquidCrystal::LiquidCrystal_I2C Lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, LiquidCrystal::t_backlightPol::POSITIVE);
-}
-
-namespace buttonsMgmt {
-    static PushButton button1 = PushButton(pins::btn1);
-    static PushButton button2 = PushButton(pins::btn2);
-    static PushButton button3 = PushButton(pins::btn3);
-    static PushButton button4 = PushButton(pins::btn4);
-    void onButtonPressed(PushButton& btn);
-    void onButtonHeld(PushButton& btn, uint16_t duration, uint16_t repeatCount);
-    void onButtonReleased(PushButton& btn, uint16_t duration);
 }
 
 namespace timeMgmt {
@@ -63,7 +53,6 @@ namespace timeMgmt {
         }
         return false;
     }
-    //Chronos::TimeProvider timeProvider;
 }
 
 void setup()
@@ -96,7 +85,7 @@ void setup()
     pinMode(pins::lcdBckLight, OUTPUT);
     analogWrite(pins::lcdBckLight, HIGH);
 
-    while(!thermoMgmt::Therm.begin()) {
+    while(!Weather::Therm.begin()) {
         delay(1000);
     }
 }
@@ -107,9 +96,9 @@ void loop()
         LCDMgmt::Lcd.setCursor(10, 1);
         float temp(NAN), hum(NAN), pres(NAN);
 
-        Weather::BME280::TempUnit tempUnit(Weather::BME280::TempUnit::TempUnit_Celsius);
-        Weather::BME280::PresUnit presUnit(Weather::BME280::PresUnit::PresUnit_Pa);
-        thermoMgmt::Therm.read(pres, temp, hum, tempUnit, presUnit);
+        Weather::Therm.read(pres, temp, hum,
+                Weather::BME280::TempUnit::TempUnit_Celsius,
+                Weather::BME280::PresUnit::PresUnit_hPa);
         LCDMgmt::Lcd.print(temp);
 
         Serial.print("Temp: ");

@@ -106,9 +106,9 @@ bool BME280::WriteSettings()
 
     CalculateRegisters(ctrlHum, ctrlMeas, config);
 
-    WriteRegister(CTRL_HUM_ADDR, ctrlHum);
-    WriteRegister(CTRL_MEAS_ADDR, ctrlMeas);
-    WriteRegister(CONFIG_ADDR, config);
+    return WriteRegister(CTRL_HUM_ADDR, ctrlHum) &&
+            WriteRegister(CTRL_MEAS_ADDR, ctrlMeas) &&
+            WriteRegister(CONFIG_ADDR, config);
 }
 
 /****************************************************************/
@@ -232,7 +232,7 @@ float BME280::CalculateTemperature(int32_t raw, int32_t& t_fine, TempUnit unit)
 /****************************************************************/
 float BME280::CalculateHumidity(int32_t raw, int32_t t_fine)
 {
-    // Code based on calibration algorthim provided by Bosch.
+    // Code based on calibration algorithm provided by Bosch.
     int32_t var1;
     uint8_t dig_H1 = m_dig[24];
     int16_t dig_H2 = (m_dig[26] << 8) | m_dig[25];

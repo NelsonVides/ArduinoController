@@ -195,7 +195,7 @@ private:
     Settings m_settings;
 
     uint8_t m_dig[32];
-    ChipModel m_chip_model;
+    ChipModel m_chip_model = ChipModel::ChipModel_UNKNOWN;
 
     bool m_initialized;
 
