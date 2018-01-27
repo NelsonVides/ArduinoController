@@ -7,6 +7,8 @@
 #ifndef KEYPADCALLBACKS_H_
 #define KEYPADCALLBACKS_H_
 
+#include "LCD/Views.h"
+
 namespace buttonsMgmt {
     static PushButton button1 = PushButton(pins::btn1);
     static PushButton button2 = PushButton(pins::btn2);
@@ -108,22 +110,31 @@ namespace buttonsMgmt {
         if (_stateLCD == 255) {
             _stateLCD = 128;
         } else if (_stateLCD == 128) {
-            _stateLCD = 16;
-        } else if (_stateLCD == 16) {
+            _stateLCD = 10;
+        } else if (_stateLCD == 10) {
             _stateLCD = 0;
         } else {
             _stateLCD = 255;
         }
         analogWrite(pins::lcdBckLight,_stateLCD);
     }
-
+/*
+    void switchRelay() {
+        static boolean _stateRelay = true;
+        _stateRelay = !_stateRelay;
+        digitalWrite(pins::relayCon, _stateRelay);
+        Serial.print("Relay state changed to ");
+        Serial.println(_stateRelay);
+    }
+*/
     // btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
     void onButtonPressed(PushButton& btn)
     {
         allButtons bt = printButtonNumber(btn);
-        Serial.println(" pressed");
         if (bt == allButtons::S1) {
             switchPowerLCD();
+        } else if (bt == allButtons::S13) {
+            Views::ViewIntro();//switchRelay();
         }
     }
 
@@ -136,6 +147,10 @@ namespace buttonsMgmt {
         Serial.print(" ms; this event has been fired ");
         Serial.print(repeatCount);
         Serial.println(" times");
+        allButtons bt = printButtonNumber(btn);
+        if (bt == allButtons::S13) {
+            Views::ViewIntro();
+        }
     }
 
     // duration reports back the total time that the button was held down
@@ -145,6 +160,10 @@ namespace buttonsMgmt {
         Serial.print(" released after ");
         Serial.print(duration);
         Serial.println(" ms");
+        allButtons bt = printButtonNumber(btn);
+        if (bt == allButtons::S13) {
+            Views::ViewIntro();
+        }
     }
 }
 #endif KEYPADCALLBACKS_H_

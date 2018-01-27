@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <Wire.h>
+#include <SoftwareSerial.h>
 #include <Time.h>
 #include <Chronos.h>
 
@@ -15,14 +16,30 @@
  */
 
 namespace pins {
-    constexpr auto SerialBaudRate = 115200;
+    constexpr auto SerialBaudRate = 115200 ;
+
     constexpr uint8_t btn1 = A0;
     constexpr uint8_t btn2 = A1;
     constexpr uint8_t btn3 = A2;
     constexpr uint8_t btn4 = A3;
+
     constexpr uint8_t lcdBckLight = 3;
+
+    constexpr uint8_t simRX = 2;
+    constexpr uint8_t simTX = 4;
+    constexpr uint8_t simRST = 8;
+
+    constexpr uint8_t relayCon = 7;
+
+    constexpr uint8_t radioCEN = 9;
+    constexpr uint8_t radioCS = 10;
+    constexpr uint8_t radioMOSI = 11;
+    constexpr uint8_t radioMISO = 12;
+    constexpr uint8_t radioSCK = 13;
+
 }
 
+#include "LCD/Views.h"
 #include "KeypadCallbacks.h"
 
 namespace Weather {
@@ -38,12 +55,9 @@ namespace Weather {
     static Weather::BME280I2C Therm(SettingsBME);
 }
 
-namespace LCDMgmt {
-    LiquidCrystal::LiquidCrystal_I2C Lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, LiquidCrystal::t_backlightPol::POSITIVE);
-}
 
 namespace timeMgmt {
-    unsigned long interval = 10000;
+    unsigned long interval = 1000;
     bool isTime() {
         static unsigned long _previousMillis;
         unsigned long currentMillis = millis();
@@ -58,17 +72,14 @@ namespace timeMgmt {
 void setup()
 {
     Serial.begin(pins::SerialBaudRate);
+
+    ///WEATHER
     Wire.begin();
+    while(!Weather::Therm.begin()) {
+        delay(1000);
+    }
 
-    Serial.println("INIT of everything");
-
-    LCDMgmt::Lcd.begin(16, 2, LiquidCrystal::LCD_5x8DOTS);
-    LCDMgmt::Lcd.clear();
-    LCDMgmt::Lcd.print("Arduino");
-    LCDMgmt::Lcd.setCursor(2, 1);
-    LCDMgmt::Lcd.print("Celcius ");
-    LCDMgmt::Lcd.setCursor(10, 1);
-
+    ///BUTTONS
     // When the button is first pressed, call the function onButtonPressed (further down the page)
     buttonsMgmt::button1.onPress(buttonsMgmt::onButtonPressed);
     buttonsMgmt::button2.onPress(buttonsMgmt::onButtonPressed);
@@ -82,24 +93,28 @@ void setup()
     buttonsMgmt::button2.onRelease(buttonsMgmt::onButtonReleased);
     buttonsMgmt::button3.onRelease(buttonsMgmt::onButtonReleased);
     buttonsMgmt::button4.onRelease(buttonsMgmt::onButtonReleased);
+
+    // Relay
+    //pinMode(pins::relayCon, OUTPUT);
+    //analogWrite(pins::relayCon, HIGH);
+
+    // LCD
+    Views::Lcd.begin(16, 2, LiquidCrystal::LCD_5x8DOTS);
+    Views::ViewIntro();
     pinMode(pins::lcdBckLight, OUTPUT);
     analogWrite(pins::lcdBckLight, HIGH);
 
-    while(!Weather::Therm.begin()) {
-        delay(1000);
-    }
+    Serial.println("INIT of everything");
 }
 
 void loop()
 {
     if (timeMgmt::isTime()) {
-        LCDMgmt::Lcd.setCursor(10, 1);
         float temp(NAN), hum(NAN), pres(NAN);
-
         Weather::Therm.read(pres, temp, hum,
-                Weather::BME280::TempUnit::TempUnit_Celsius,
-                Weather::BME280::PresUnit::PresUnit_hPa);
-        LCDMgmt::Lcd.print(temp);
+            Weather::BME280::TempUnit::TempUnit_Celsius,
+            Weather::BME280::PresUnit::PresUnit_hPa);
+        Views::ViewWeather(pres, hum, temp);
 
         Serial.print("Temp: ");
         Serial.print(temp);
@@ -118,5 +133,3 @@ void loop()
     buttonsMgmt::button3.update();
     buttonsMgmt::button4.update();
 }
-
-#include "KeypadCallbacks.h"

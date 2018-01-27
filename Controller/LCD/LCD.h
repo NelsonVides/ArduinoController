@@ -495,7 +495,7 @@ public:
     or the adequate backlight control constructor.
     @see setBacklightPin.
     
-    NOTE: The prefered methods to control the backlight are "backlight" and
+    Note: The prefered methods to control the backlight are "backlight" and
     "noBacklight".
     
     @param      0..255 - the value is very dependent on the LCD. However, 
