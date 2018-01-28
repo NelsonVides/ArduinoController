@@ -23,13 +23,13 @@ namespace pins {
     constexpr uint8_t btn3 = A2;
     constexpr uint8_t btn4 = A3;
 
-    constexpr uint8_t lcdBckLight = 3;
+    constexpr uint8_t relayCon = 2;
 
-    constexpr uint8_t simRX = 2;
-    constexpr uint8_t simTX = 4;
-    constexpr uint8_t simRST = 8;
+    constexpr uint8_t lcdBckLight = 5;
 
-    constexpr uint8_t relayCon = 7;
+    constexpr uint8_t simRST = 6;
+    constexpr uint8_t simRX = 7;
+    constexpr uint8_t simTX = 8;
 
     constexpr uint8_t radioCEN = 9;
     constexpr uint8_t radioCS = 10;
@@ -77,6 +77,8 @@ String t;
 void setup()
 {
     Serial.begin(pins::SerialBaudRate);
+
+    //SIM card
     SIM::sim.begin(9600);
     delay(1000);
 
@@ -102,8 +104,7 @@ void setup()
     buttonsMgmt::button4.onRelease(buttonsMgmt::onButtonReleased);
 
     // Relay
-    //pinMode(pins::relayCon, OUTPUT);
-    //analogWrite(pins::relayCon, HIGH);
+    pinMode(pins::relayCon, OUTPUT);
 
     // LCD
     Views::Lcd.begin(16, 2, LiquidCrystal::LCD_5x8DOTS);

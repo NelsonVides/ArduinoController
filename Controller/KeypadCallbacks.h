@@ -33,70 +33,70 @@ namespace buttonsMgmt {
         }
         if (btn.is(button1)) {
             if (180 < btnNum && btnNum < 220) {
-                Serial.print(F("Button 1"));
+                Serial.print(F("Button 1 "));
                 return allButtons::S1;
             }
             if (380 < btnNum && btnNum < 420) {
-                Serial.print(F("Button 2"));
+                Serial.print(F("Button 2 "));
                 return allButtons::S2;
             }
             if (580 < btnNum && btnNum < 620) {
-                Serial.print(F("Button 3"));
+                Serial.print(F("Button 3 "));
                 return allButtons::S3;
             }
             if (780 < btnNum && btnNum < 820) {
-                Serial.print(F("Button 4"));
+                Serial.print(F("Button 4 "));
                 return allButtons::S4;
             }
         } else if (btn.is(button2)) {
             if (180 < btnNum && btnNum < 220) {
-                Serial.print(F("Button 5"));
+                Serial.print(F("Button 5 "));
                 return allButtons::S5;
             }
             if (380 < btnNum && btnNum < 420) {
-                Serial.print(F("Button 6"));
+                Serial.print(F("Button 6 "));
                 return allButtons::S6;
             }
             if (580 < btnNum && btnNum < 620) {
-                Serial.print(F("Button 7"));
+                Serial.print(F("Button 7 "));
                 return allButtons::S7;
             }
             if (780 < btnNum && btnNum < 820) {
-                Serial.print(F("Button 8"));
+                Serial.print(F("Button 8 "));
                 return allButtons::S8;
             }
         } else if (btn.is(button3)) {
             if (180 < btnNum && btnNum < 220) {
-                Serial.print(F("Button 9"));
+                Serial.print(F("Button 9 "));
                 return allButtons::S9;
             }
             if (380 < btnNum && btnNum < 420) {
-                Serial.print(F("Button 10"));
+                Serial.print(F("Button 10 "));
                 return allButtons::S10;
             }
             if (580 < btnNum && btnNum < 620) {
-                Serial.print(F("Button 11"));
+                Serial.print(F("Button 11 "));
                 return allButtons::S11;
             }
             if (780 < btnNum && btnNum < 820) {
-                Serial.print(F("Button 12"));
+                Serial.print(F("Button 12 "));
                 return allButtons::S12;
             }
         } else if (btn.is(button4)) {
             if (180 < btnNum && btnNum < 220) {
-                Serial.print(F("Button 13"));
+                Serial.print(F("Button 13 "));
                 return allButtons::S13;
             }
             if (380 < btnNum && btnNum < 420) {
-                Serial.print(F("Button 14"));
+                Serial.print(F("Button 14 "));
                 return allButtons::S14;
             }
             if (580 < btnNum && btnNum < 620) {
-                Serial.print(F("Button 15"));
+                Serial.print(F("Button 15 "));
                 return allButtons::S15;
             }
             if (780 < btnNum && btnNum < 820) {
-                Serial.print(F("Button 16"));
+                Serial.print(F("Button 16 "));
                 return allButtons::S16;
             }
         }
@@ -110,23 +110,21 @@ namespace buttonsMgmt {
         if (_stateLCD == 255) {
             _stateLCD = 128;
         } else if (_stateLCD == 128) {
-            _stateLCD = 10;
-        } else if (_stateLCD == 10) {
+            _stateLCD = 8;
+        } else if (_stateLCD == 8) {
             _stateLCD = 0;
         } else {
             _stateLCD = 255;
         }
         analogWrite(pins::lcdBckLight,_stateLCD);
     }
-/*
+
     void switchRelay() {
         static boolean _stateRelay = true;
         _stateRelay = !_stateRelay;
         digitalWrite(pins::relayCon, _stateRelay);
-        Serial.print(F("Relay state changed to "));
-        Serial.println(_stateRelay);
     }
-*/
+
     // btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
     void onButtonPressed(PushButton& btn)
     {
@@ -134,7 +132,9 @@ namespace buttonsMgmt {
         if (bt == allButtons::S1) {
             switchPowerLCD();
         } else if (bt == allButtons::S13) {
-            Views::ViewIntro();//switchRelay();
+            Views::ViewIntro();
+        } else if (bt == allButtons::S16) {
+            switchRelay();
         }
     }
 
