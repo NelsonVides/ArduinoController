@@ -142,9 +142,9 @@ namespace buttonsMgmt {
     // repeatCount tells us how many times this function has been called by this button.
     void onButtonHeld(PushButton& btn, uint16_t duration, uint16_t repeatCount)
     {
-        Serial.print(F("button has been held for "));
+        Serial.print(F("button held for "));
         Serial.print(duration);
-        Serial.print(F(" ms; this event has been fired "));
+        Serial.print(F(" ms; this event fired "));
         Serial.print(repeatCount);
         Serial.println(F(" times"));
         allButtons bt = printButtonNumber(btn);

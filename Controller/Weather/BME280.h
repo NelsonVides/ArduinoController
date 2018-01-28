@@ -40,6 +40,13 @@
 /// the Bme280 environmental sensor.
 ///
 namespace Weather {
+struct Measures {
+public:
+    float pressure;
+    float humidity;
+    float temperature;
+};
+
 class BME280 {
 public:
 
@@ -151,9 +158,8 @@ public:
 
     /////////////////////////////////////////////////////////////////
     /// Read the data from the BME280 in the specified unit.
-    void read(float& pressure, float& temperature, float& humidity,
-            TempUnit tempUnit = TempUnit::TempUnit_Celsius,
-            PresUnit presUnit = PresUnit::PresUnit_hPa);
+    const Measures& read(TempUnit tempUnit = TempUnit::TempUnit_Celsius,
+                         PresUnit presUnit = PresUnit::PresUnit_hPa);
 
     /*****************************************************************/
     /* ACCESSOR FUNCTIONS                                            */

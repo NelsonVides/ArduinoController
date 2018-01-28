@@ -118,19 +118,18 @@ void setup()
 void loop()
 {
     if (timeMgmt::isTime()) {
-        float temp(NAN), hum(NAN), pres(NAN);
-        Weather::Therm.read(pres, temp, hum,
+        const Weather::Measures res = Weather::Therm.read(
                 Weather::BME280::TempUnit::TempUnit_Celsius,
                 Weather::BME280::PresUnit::PresUnit_hPa);
-        Views::ViewWeather(pres, hum, temp);
+        Views::ViewWeather(res);
 
-        Serial.print(temp);
+        Serial.print(res.temperature);
         Serial.print(F("°C"));
         Serial.print(F("\t\tHumidity: "));
-        Serial.print(hum);
+        Serial.print(res.humidity);
         Serial.print(F("% RH"));
         Serial.print(F("\t\tPressure: "));
-        Serial.print(pres);
+        Serial.print(res.pressure);
         Serial.println(F("Pa"));
     }
 
