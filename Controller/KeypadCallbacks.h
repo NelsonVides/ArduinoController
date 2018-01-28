@@ -33,74 +33,74 @@ namespace buttonsMgmt {
         }
         if (btn.is(button1)) {
             if (180 < btnNum && btnNum < 220) {
-                Serial.print("Button 1");
+                Serial.print(F("Button 1"));
                 return allButtons::S1;
             }
             if (380 < btnNum && btnNum < 420) {
-                Serial.print("Button 2");
+                Serial.print(F("Button 2"));
                 return allButtons::S2;
             }
             if (580 < btnNum && btnNum < 620) {
-                Serial.print("Button 3");
+                Serial.print(F("Button 3"));
                 return allButtons::S3;
             }
             if (780 < btnNum && btnNum < 820) {
-                Serial.print("Button 4");
+                Serial.print(F("Button 4"));
                 return allButtons::S4;
             }
         } else if (btn.is(button2)) {
             if (180 < btnNum && btnNum < 220) {
-                Serial.print("Button 5");
+                Serial.print(F("Button 5"));
                 return allButtons::S5;
             }
             if (380 < btnNum && btnNum < 420) {
-                Serial.print("Button 6");
+                Serial.print(F("Button 6"));
                 return allButtons::S6;
             }
             if (580 < btnNum && btnNum < 620) {
-                Serial.print("Button 7");
+                Serial.print(F("Button 7"));
                 return allButtons::S7;
             }
             if (780 < btnNum && btnNum < 820) {
-                Serial.print("Button 8");
+                Serial.print(F("Button 8"));
                 return allButtons::S8;
             }
         } else if (btn.is(button3)) {
             if (180 < btnNum && btnNum < 220) {
-                Serial.print("Button 9");
+                Serial.print(F("Button 9"));
                 return allButtons::S9;
             }
             if (380 < btnNum && btnNum < 420) {
-                Serial.print("Button 10");
+                Serial.print(F("Button 10"));
                 return allButtons::S10;
             }
             if (580 < btnNum && btnNum < 620) {
-                Serial.print("Button 11");
+                Serial.print(F("Button 11"));
                 return allButtons::S11;
             }
             if (780 < btnNum && btnNum < 820) {
-                Serial.print("Button 12");
+                Serial.print(F("Button 12"));
                 return allButtons::S12;
             }
         } else if (btn.is(button4)) {
             if (180 < btnNum && btnNum < 220) {
-                Serial.print("Button 13");
+                Serial.print(F("Button 13"));
                 return allButtons::S13;
             }
             if (380 < btnNum && btnNum < 420) {
-                Serial.print("Button 14");
+                Serial.print(F("Button 14"));
                 return allButtons::S14;
             }
             if (580 < btnNum && btnNum < 620) {
-                Serial.print("Button 15");
+                Serial.print(F("Button 15"));
                 return allButtons::S15;
             }
             if (780 < btnNum && btnNum < 820) {
-                Serial.print("Button 16");
+                Serial.print(F("Button 16"));
                 return allButtons::S16;
             }
         }
-        Serial.print("Hmmm, no button was");
+        Serial.print(F("Hmmm, no button was"));
         return allButtons::unKnown;
     }
 
@@ -123,7 +123,7 @@ namespace buttonsMgmt {
         static boolean _stateRelay = true;
         _stateRelay = !_stateRelay;
         digitalWrite(pins::relayCon, _stateRelay);
-        Serial.print("Relay state changed to ");
+        Serial.print(F("Relay state changed to "));
         Serial.println(_stateRelay);
     }
 */
@@ -142,11 +142,11 @@ namespace buttonsMgmt {
     // repeatCount tells us how many times this function has been called by this button.
     void onButtonHeld(PushButton& btn, uint16_t duration, uint16_t repeatCount)
     {
-        Serial.print("button has been held for ");
+        Serial.print(F("button has been held for "));
         Serial.print(duration);
-        Serial.print(" ms; this event has been fired ");
+        Serial.print(F(" ms; this event has been fired "));
         Serial.print(repeatCount);
-        Serial.println(" times");
+        Serial.println(F(" times"));
         allButtons bt = printButtonNumber(btn);
         if (bt == allButtons::S13) {
             Views::ViewIntro();
@@ -157,9 +157,9 @@ namespace buttonsMgmt {
     void onButtonReleased(PushButton& btn, uint16_t duration)
     {
         printButtonNumber(btn);
-        Serial.print(" released after ");
+        Serial.print(F(" released after "));
         Serial.print(duration);
-        Serial.println(" ms");
+        Serial.println(F(" ms"));
         allButtons bt = printButtonNumber(btn);
         if (bt == allButtons::S13) {
             Views::ViewIntro();

@@ -16,7 +16,7 @@
  */
 
 namespace pins {
-    constexpr auto SerialBaudRate = 115200 ;
+    constexpr auto SerialBaudRate = 115200;
 
     constexpr uint8_t btn1 = A0;
     constexpr uint8_t btn2 = A1;
@@ -55,10 +55,10 @@ namespace Weather {
     static Weather::BME280I2C Therm(SettingsBME);
 }
 
-
 namespace timeMgmt {
     unsigned long interval = 1000;
-    bool isTime() {
+    bool isTime()
+    {
         static unsigned long _previousMillis;
         unsigned long currentMillis = millis();
         if (currentMillis - _previousMillis >= interval) {
@@ -69,13 +69,20 @@ namespace timeMgmt {
     }
 }
 
+namespace SIM {
+    //Create software serial object to communicate with SIM800
+    SoftwareSerial sim(pins::simTX, pins::simRX);
+}
+String t;
 void setup()
 {
     Serial.begin(pins::SerialBaudRate);
+    SIM::sim.begin(9600);
+    delay(1000);
 
     ///WEATHER
     Wire.begin();
-    while(!Weather::Therm.begin()) {
+    while (!Weather::Therm.begin()) {
         delay(1000);
     }
 
@@ -104,7 +111,7 @@ void setup()
     pinMode(pins::lcdBckLight, OUTPUT);
     analogWrite(pins::lcdBckLight, HIGH);
 
-    Serial.println("INIT of everything");
+    Serial.println(F("INIT of everything"));
 }
 
 void loop()
@@ -112,19 +119,18 @@ void loop()
     if (timeMgmt::isTime()) {
         float temp(NAN), hum(NAN), pres(NAN);
         Weather::Therm.read(pres, temp, hum,
-            Weather::BME280::TempUnit::TempUnit_Celsius,
-            Weather::BME280::PresUnit::PresUnit_hPa);
+                Weather::BME280::TempUnit::TempUnit_Celsius,
+                Weather::BME280::PresUnit::PresUnit_hPa);
         Views::ViewWeather(pres, hum, temp);
 
-        Serial.print("Temp: ");
         Serial.print(temp);
-        Serial.print("°C");
-        Serial.print("\t\tHumidity: ");
+        Serial.print(F("°C"));
+        Serial.print(F("\t\tHumidity: "));
         Serial.print(hum);
-        Serial.print("% RH");
-        Serial.print("\t\tPressure: ");
+        Serial.print(F("% RH"));
+        Serial.print(F("\t\tPressure: "));
         Serial.print(pres);
-        Serial.println("Pa");
+        Serial.println(F("Pa"));
     }
 
     // Update those buttons

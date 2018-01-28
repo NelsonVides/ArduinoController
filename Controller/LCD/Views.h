@@ -17,21 +17,21 @@ namespace Views {
     void ViewIntro()
     {
         Lcd.clear();
-        Lcd.print("Arduino Rozana");
+        Lcd.print(F("Arduino Rozana"));
         Lcd.setCursor(0, 1);
-        Lcd.print("Vides & Grochola");
+        Lcd.print(F("Vides & Grochola"));
     }
 
     void ViewWeather(float pres, float hum, float temp)
     {
         Lcd.clear();
-        Lcd.print("Pa ");
+        Lcd.print(F("Pa "));
         Lcd.print(pres, 0);
-        Lcd.print("  RH ");
+        Lcd.print(F("  RH "));
         Lcd.print(hum, 0);
-        Lcd.print("%");
+        Lcd.print(F("%"));
         Lcd.setCursor(0, 1);
-        Lcd.print("Celcius ");
+        Lcd.print(F("Celcius "));
         Lcd.print(temp, 2);
     }
 
