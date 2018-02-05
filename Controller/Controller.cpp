@@ -73,7 +73,7 @@ namespace SIM {
     //Create software serial object to communicate with SIM800
     SoftwareSerial sim(pins::simTX, pins::simRX);
 }
-String t;
+
 void setup()
 {
     Serial.begin(pins::SerialBaudRate);
