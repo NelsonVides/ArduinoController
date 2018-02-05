@@ -4,7 +4,6 @@
 #include <SPI.h>
 #include <LowPower.h>
 #include <RF24.h>
-#include <RGBLED.hpp>
 #include "MQ135.h" //TODO: do something with all that floating point binary boilerplate! :(
 #include "Weather/BME280I2C.h"
 
@@ -22,8 +21,8 @@ namespace pins {
     //TODO: https://hackaday.io/project/3475-sniffing-trinket/log/12363-mq135-arduino-library
 
     constexpr uint8_t redLED = 3;
-    constexpr uint8_t greenLED = 5;
-    constexpr uint8_t blueLED = 6;
+    constexpr uint8_t greenLED = 6;
+    constexpr uint8_t blueLED = 5;
 
     constexpr uint8_t radioCEN = 9;
     constexpr uint8_t radioCS = 10;
@@ -39,35 +38,6 @@ namespace Air {
 
 namespace Radio {
     RF24 Trasmitter(pins::radioCEN, pins::radioCS);
-}
-
-namespace Led {
-    RGBLED rgbLed(pins::redLED, pins::greenLED, pins::blueLED, CommonElectrode::cathode);
-
-    uint8_t mapToByte(uint16_t val, uint8_t inMin, uint8_t inMax)
-    {
-        return (255 * (val - inMin)) / (inMax - inMin);
-    }
-
-    void setLED(const Weather::Measures& measures, float smog, uint16_t ambient)
-    {
-        if (smog > 1000.0) { // full white
-            rgbLed.brightness(255);
-            rgbLed(255, 255, 255);
-        } else if (measures.temperature <= -20.0) { // full blue
-            rgbLed.brightness(255);
-            rgbLed(0, 0, 255);
-        } else if (measures.temperature >= 40.0) { // full red
-            rgbLed.brightness(255);
-            rgbLed(255, 0, 0);
-        } else {
-            uint8_t redFactor = mapToByte((uint16_t)measures.temperature, -20,40);
-            uint8_t blueFactor = mapToByte((uint16_t)measures.temperature, 40,-20);
-            uint8_t greenFactor = mapToByte(smog, 0,1023);
-            rgbLed.brightness(map(ambient,0,200, 10, 255));
-            rgbLed(redFactor, blueFactor, greenFactor);
-        }
-    }
 }
 
 namespace Weather {
@@ -124,11 +94,8 @@ void loop()
                                       Weather::BME280::TempUnit::TempUnit_Celsius,
                                       Weather::BME280::PresUnit::PresUnit_hPa);
 
-        const uint16_t photoValue = analogRead(pins::photoSensor);
         const float smog = Air::Smog.getCorrectedPPM(res.temperature, res.humidity);
-
-        Led::setLED(res, smog, photoValue);
-        Led::rgbLed.show();
+        const uint16_t photoValue = analogRead(pins::photoSensor);
 
         ///Serial debug stuff
         Serial.print(F("smog: "));
