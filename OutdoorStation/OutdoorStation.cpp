@@ -77,10 +77,12 @@ void setup()
 
     ///WEATHER
     Wire.begin();
-    while (!Weather::Therm.begin()) {
-        Serial.println(F("Got it"));
-        delay(1000);
-    }
+    //while (!Weather::Therm.begin()) {
+    //    delay(1000);
+    //}
+
+    ///SMOG
+    Air::Smog.begin();
 
     Serial.println(F("INIT of everything"));
 }
@@ -94,7 +96,7 @@ void loop()
                                       Weather::BME280::TempUnit::TempUnit_Celsius,
                                       Weather::BME280::PresUnit::PresUnit_hPa);
 
-        const float smog = Air::Smog.getCorrectedPPM(res.temperature, res.humidity);
+        const float smog = Air::Smog.getCalibratedCO(res.temperature, res.humidity);
         const uint16_t photoValue = analogRead(pins::photoSensor);
 
         ///Serial debug stuff
