@@ -359,22 +359,20 @@ float BME280::hum()
 }
 
 /****************************************************************/
-const Measures BME280::read(TempUnit tempUnit, PresUnit presUnit)
+void BME280::read(float& pressure, float& temperature, float& humidity,
+        TempUnit tempUnit, PresUnit presUnit)
 {
-    Measures res;
     int32_t data[8];
     int32_t t_fine;
     if (!ReadData(data)) {
-        res.pressure = res.temperature = res.humidity = NAN;
-        return res;
+        pressure = temperature = humidity = NAN;
     }
     uint32_t rawPressure = (data[0] << 12) | (data[1] << 4) | (data[2] >> 4);
     uint32_t rawTemp = (data[3] << 12) | (data[4] << 4) | (data[5] >> 4);
     uint32_t rawHumidity = (data[6] << 8) | data[7];
-    res.temperature = CalculateTemperature(rawTemp, t_fine, tempUnit);
-    res.pressure = CalculatePressure(rawPressure, t_fine, presUnit);
-    res.humidity = CalculateHumidity(rawHumidity, t_fine);
-    return res;
+    temperature = CalculateTemperature(rawTemp, t_fine, tempUnit);
+    pressure = CalculatePressure(rawPressure, t_fine, presUnit);
+    humidity = CalculateHumidity(rawHumidity, t_fine);
 }
 
 /****************************************************************/
