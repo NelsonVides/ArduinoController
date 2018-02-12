@@ -4,12 +4,13 @@
 #include <SPI.h>
 #include <RF24.h>
 #include <LowPower.h>
-#include "MQ135.h" //TODO: do something with all that floating point binary boilerplate! :(
+#include "AirQuality/MQ135.h" //TODO: do something with all that floating point binary boilerplate! :(
 #include "Weather/BME280I2C.h"
+#include "photoResistor/LightDependentResistor.h"
 
 //Measure Battery>
-#include <VoltageReference.h>
-#include <Battery.h>
+#include "Battery/VoltageReference.h"
+#include "battery/Battery.h"
 
 /*TODO's
  * Implement WatchDog and Sleeps to save energy.
@@ -18,13 +19,14 @@
 namespace pins {
     constexpr auto SerialBaudRate = 115200;
 
-    constexpr auto wakeupInterrupt = 2;
+    constexpr auto wakeupInterrupt = 3;
 
     constexpr uint8_t photoSensor = A0;
-    constexpr uint8_t smogSensor = A1;
+    constexpr uint8_t smogSensor = A2;
     //TODO: https://hackaday.io/project/3475-sniffing-trinket/log/12363-mq135-arduino-library
-    constexpr uint8_t powerSensor = A2;
-    constexpr uint8_t powerActivator = 2;
+
+    constexpr uint8_t powerSensor = A1;
+    constexpr uint8_t powerActivator = 8;
 
     constexpr uint8_t redLED = 3;
     constexpr uint8_t greenLED = 6;
@@ -39,8 +41,10 @@ namespace pins {
 }
 
 namespace Power {
-    constexpr float ratio = 22;
-    //Battery bat(3500, 2500, pins::powerSensor, pins::powerActivator);
+    constexpr float ratio = (4.62 + 9.6) / 9.6;
+    constexpr uint8_t t = 0;
+    //VoltageReference vRef;
+    Battery bat(2200, 3300, pins::powerSensor, pins::powerActivator, 3382, Power::ratio);
 }
 
 namespace Air {
@@ -49,6 +53,15 @@ namespace Air {
 
 namespace Radio {
     RF24 Trasmitter(pins::radioCEN, pins::radioCS);
+}
+
+namespace Light {
+    constexpr uint16_t pullDown = 988;
+    LightDependentResistor photoCell(
+            pins::photoSensor,
+            pullDown,
+            LightDependentResistor::ePhotoCellKind::GL5516,
+            false);
 }
 
 namespace Weather {
@@ -79,6 +92,7 @@ namespace timeMgmt {
 void setup()
 {
     Serial.begin(pins::SerialBaudRate);
+    Serial.println(F("Serial started. On setup."));
 
     ///RADIO
     Radio::Trasmitter.begin();
@@ -95,39 +109,48 @@ void setup()
     ///SMOG
     Air::Smog.begin();
 
+    ///BATTERY
+    Power::bat.begin();
+
     Serial.println(F("INIT of everything"));
 }
 
 class Payload {
 public:
     float pressure;
-    float humidity;
     float temperature;
-    uint16_t photoValue;
+    float humidity;
     float smog;
+    uint16_t photoValue;
+    uint16_t batteryLoad;
 };
 
 void loop()
 {
     //  wdt_enable(WDTO_8S);
     if (timeMgmt::isTime()) {
-        Payload load;
+        static Payload load;
 
         Weather::Therm.read(load.pressure, load.temperature, load.humidity,
                 Weather::BME280::TempUnit::TempUnit_Celsius,
                 Weather::BME280::PresUnit::PresUnit_hPa);
 
         load.smog = Air::Smog.getCalibratedCO(load.temperature, load.humidity);
-        load.photoValue = analogRead(pins::photoSensor);
+        load.photoValue = Light::photoCell.getCurrentLux();
+        load.batteryLoad = Power::bat.voltage();
 
         ///Serial debug stuff
-        Serial.print(F("smog: "));
+        Serial.print(F("Battery: "));
+        Serial.print(load.batteryLoad);
+        Serial.print(F(" V"));
+
+        Serial.print(F("\tSmog: "));
         Serial.print(load.smog);
         Serial.print(F(" gaz"));
 
         Serial.print(F("\tAmbient light: "));
         Serial.print(load.photoValue);
-        Serial.print(F(" lumens"));
+        Serial.print(F(" luxs"));
 
         Serial.print(F(" \tTemperature: "));
         Serial.print(load.temperature);

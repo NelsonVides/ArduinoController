@@ -1,2 +1,2 @@
 eclipse.preferences.version=1
-libraries=["Low-Power","Voltage Reference",{"package"\:"arduino","platform"\:"avr","library"\:"SPI"},"Battery Sense",{"package"\:"arduino","platform"\:"avr","library"\:"Wire"},"RF24"]
+libraries=["Low-Power",{"package"\:"arduino","platform"\:"avr","library"\:"SPI"},{"package"\:"arduino","platform"\:"avr","library"\:"Wire"},"RF24"]
