@@ -37,7 +37,6 @@ namespace pins {
     constexpr uint8_t radioMOSI = 11;
     constexpr uint8_t radioMISO = 12;
     constexpr uint8_t radioSCK = 13;
-    constexpr uint8_t addresses[2][6] = {"000001","000002"};
 }
 
 namespace Power {
@@ -52,6 +51,7 @@ namespace Air {
 }
 
 namespace Radio {
+    constexpr uint64_t writingPipe = 0xB00B1E5000LL;
     RF24 Trasmitter(pins::radioCEN, pins::radioCS);
 }
 
@@ -96,8 +96,11 @@ void setup()
 
     ///RADIO
     Radio::Trasmitter.begin();
-    Radio::Trasmitter.openWritingPipe(pins::addresses[0]); // 00002
-    Radio::Trasmitter.openReadingPipe(1, pins::addresses[1]); // 00001
+    Radio::Trasmitter.setAutoAck(true);
+    Radio::Trasmitter.enableAckPayload();
+    Radio::Trasmitter.setRetries(4,3);
+    Radio::Trasmitter.openWritingPipe(Radio::writingPipe);
+    Radio::Trasmitter.stopListening();
     Radio::Trasmitter.setPALevel(RF24_PA_MIN);
 
     ///WEATHER
