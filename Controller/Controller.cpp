@@ -115,6 +115,9 @@ void setup()
     // Relay
     pinMode(pins::relayCon, OUTPUT);
 
+    ///SMOG
+    Air::Smog.begin();
+
     // LCD
     Views::Lcd.begin(16, 2, LiquidCrystal::LCD_5x8DOTS);
     Views::ViewIntro();
