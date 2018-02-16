@@ -4,6 +4,7 @@
 #include <Time.h>
 #include <Chronos.h>
 
+#include "AirQuality/MQ135.h" //TODO: do something with all that floating point binary boilerplate! :(
 #include "LCD/LiquidCrystal_I2C.h"
 #include "Keypad/PushButton.h"
 #include "Weather/BME280I2C.h"
@@ -26,6 +27,10 @@ namespace pins {
     constexpr uint8_t relayCon = 2;
 
     constexpr uint8_t lcdBckLight = 5;
+
+    constexpr uint8_t smogSensor = A2;
+    constexpr uint8_t smogSwitch = 2;
+    //TODO: https://hackaday.io/project/3475-sniffing-trinket/log/12363-mq135-arduino-library
 
     constexpr uint8_t simRST = 6;
     constexpr uint8_t simRX = 7;
@@ -53,6 +58,10 @@ namespace Weather {
             Weather::BME280I2C::SpiEnable::SpiEnable_False,
             Weather::BME280I2C::I2CAddr_0x76);
     static Weather::BME280I2C Therm(SettingsBME);
+}
+
+namespace Air {
+    MQ135 Smog = MQ135(pins::smogSensor);
 }
 
 namespace timeMgmt {

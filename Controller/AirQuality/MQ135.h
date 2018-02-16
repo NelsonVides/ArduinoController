@@ -18,22 +18,23 @@
 #include "WProgram.h"
 #endif
 
+//TODO: double-check those r0 later
 /// To convert readed resistance into ohms
 constexpr float RLOAD = 10.0;
 /// R0 for AIR
 constexpr float r0Air = 1;
 /// R0 for CO **measured with 24hrs of exposure**
-constexpr float r0CO = 69.65;
+constexpr float r0CO = 3.10;
 /// R0 for CO2 **realized 24 hrs of exposure**
-constexpr float r0CO2 = 553.232;
+constexpr float r0CO2 = 24.4;
 /// R0 for Ethanol **measured with 24hrs of exposure**
-constexpr float r0Ethanol = 240.293;
+constexpr float r0Ethanol = 10.61;
 /// R0 for Ammonium **measured with 24hrs of exposure**
-constexpr float r0NH4 = 164.8282;
+constexpr float r0NH4 = 7.22;
 /// R0 for Toluene **measured with 24hrs of exposure**
-constexpr float r0Toluene = 130.726;
+constexpr float r0Toluene = 7.03;
 /// R0 for Acetone **measured with 24hrs of exposure**
-constexpr float r0Acetone = 224.6261;
+constexpr float r0Acetone = 12.44;
 /// Parameters Equation for CO
 constexpr float scaleFactorCO = 662.9382;
 constexpr float exponentCO = 4.0241;
