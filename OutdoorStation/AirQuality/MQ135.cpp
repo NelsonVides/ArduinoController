@@ -108,6 +108,9 @@ float MQ135::getAcetonePPM() const {
 @return The sensor resistance RZero in kOhm
 */
 /**************************************************************************/
+float MQ135::getRZero() const {
+    return getResistance() * pow((397.13/116.6020682), (1./2.769034857));
+}
 float MQ135::getRZeroCO() const {
     return getResistance() * pow((atmCO/scaleFactorCO), (1./exponentCO));
 }

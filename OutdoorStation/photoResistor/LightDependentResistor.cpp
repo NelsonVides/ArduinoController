@@ -13,33 +13,34 @@
 LightDependentResistor::LightDependentResistor(
         int pin,
         unsigned long other_resistor,
-        ePhotoCellKind kind, bool onground)
+        ePhotoCellKind kind,
+        bool onground)
         : _photocell_on_ground(onground),
           _pin(pin),
           _other_resistor(other_resistor)
 {
     switch (kind) {
-        case GL5516:
+        case ePhotoCellKind::GL5516:
             _mult_value = 29634400;
             _pow_value = 1.6689;
             break;
-        case GL5537_1:
+        case ePhotoCellKind::GL5537_1:
             _mult_value = 32435800;
             _pow_value = 1.4899;
             break;
-        case GL5537_2:
+        case ePhotoCellKind::GL5537_2:
             _mult_value = 2801820;
             _pow_value = 1.1772;
             break;
-        case GL5539:
+        case ePhotoCellKind::GL5539:
             _mult_value = 208510000;
             _pow_value = 1.4850;
             break;
-        case GL5549:
+        case ePhotoCellKind::GL5549:
             _mult_value = 44682100;
             _pow_value = 1.2750;
             break;
-        case GL5528:
+        case ePhotoCellKind::GL5528:
         default:
             _mult_value = 32017200;
             _pow_value = 1.5832;

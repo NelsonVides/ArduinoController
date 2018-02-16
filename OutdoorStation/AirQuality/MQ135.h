@@ -23,17 +23,17 @@ constexpr float RLOAD = 10.0;
 /// R0 for AIR
 constexpr float r0Air = 1;
 /// R0 for CO **measured with 24hrs of exposure**
-constexpr float r0CO = 7.41235;
+constexpr float r0CO = 69.65;
 /// R0 for CO2 **realized 24 hrs of exposure**
-constexpr float r0CO2 = 61.10364;
+constexpr float r0CO2 = 553.232;
 /// R0 for Ethanol **measured with 24hrs of exposure**
-constexpr float r0Ethanol = 26.35573;
+constexpr float r0Ethanol = 240.293;
 /// R0 for Ammonium **measured with 24hrs of exposure**
-constexpr float r0NH4 = 18.4409;
+constexpr float r0NH4 = 164.8282;
 /// R0 for Toluene **measured with 24hrs of exposure**
-constexpr float r0Toluene = 17.39102;
+constexpr float r0Toluene = 130.726;
 /// R0 for Acetone **measured with 24hrs of exposure**
-constexpr float r0Acetone = 31.29273;
+constexpr float r0Acetone = 224.6261;
 /// Parameters Equation for CO
 constexpr float scaleFactorCO = 662.9382;
 constexpr float exponentCO = 4.0241;
@@ -88,6 +88,7 @@ public:
     float getToluenePPM() const;
     float getAcetonePPM() const;
 
+    float getRZero() const;
     float getRZeroCO() const;
     float getRZeroCO2() const;
     float getRZeroEthanol() const;

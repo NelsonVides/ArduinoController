@@ -2,15 +2,13 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <SPI.h>
+#include <nRF24L01.h>
 #include <RF24.h>
 #include <LowPower.h>
 #include "AirQuality/MQ135.h" //TODO: do something with all that floating point binary boilerplate! :(
 #include "Weather/BME280I2C.h"
 #include "photoResistor/LightDependentResistor.h"
-
-//Measure Battery>
 #include "Battery/VoltageReference.h"
-#include "battery/Battery.h"
 
 /*TODO's
  * Implement WatchDog and Sleeps to save energy.
@@ -19,18 +17,11 @@
 namespace pins {
     constexpr auto SerialBaudRate = 115200;
 
-    constexpr auto wakeupInterrupt = 3;
-
     constexpr uint8_t photoSensor = A0;
+
     constexpr uint8_t smogSensor = A2;
+    constexpr uint8_t smogSwitch = 2;
     //TODO: https://hackaday.io/project/3475-sniffing-trinket/log/12363-mq135-arduino-library
-
-    constexpr uint8_t powerSensor = A1;
-    constexpr uint8_t powerActivator = 8;
-
-    constexpr uint8_t redLED = 3;
-    constexpr uint8_t greenLED = 6;
-    constexpr uint8_t blueLED = 5;
 
     constexpr uint8_t radioCEN = 9;
     constexpr uint8_t radioCS = 10;
@@ -40,10 +31,7 @@ namespace pins {
 }
 
 namespace Power {
-    constexpr float ratio = (4.62 + 9.6) / 9.6;
-    constexpr uint8_t t = 0;
-    //VoltageReference vRef;
-    Battery bat(2200, 3300, pins::powerSensor, pins::powerActivator, 3382, Power::ratio);
+    VoltageReference vRef;
 }
 
 namespace Air {
@@ -60,7 +48,7 @@ namespace Light {
     LightDependentResistor photoCell(
             pins::photoSensor,
             pullDown,
-            LightDependentResistor::ePhotoCellKind::GL5516,
+            LightDependentResistor::ePhotoCellKind::GL5537_1,
             false);
 }
 
@@ -113,7 +101,7 @@ void setup()
     Air::Smog.begin();
 
     ///BATTERY
-    Power::bat.begin();
+    Power::vRef.begin(1093905);
 
     Serial.println(F("INIT of everything"));
 }
@@ -128,43 +116,71 @@ public:
     uint16_t batteryLoad;
 };
 
+
+inline void sleepMinutes(uint8_t min)
+{
+    for (int i = 0; i < ((uint8_t)(7.5 * min)); i++) {
+        LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
+    }
+}
+
+
 void loop()
 {
-    //  wdt_enable(WDTO_8S);
-    if (timeMgmt::isTime()) {
-        static Payload load;
+    //sleepMinutes(15);
 
-        Weather::Therm.read(load.pressure, load.temperature, load.humidity,
+    float resistance = Air::Smog.getResistance();//resistance
+    Air::Smog.getRZero();
+
+    if (timeMgmt::isTime()) {
+        Radio::Trasmitter.powerUp();
+        Radio::Trasmitter.stopListening();
+
+        static Payload payload;
+        Weather::Therm.read(payload.pressure, payload.temperature, payload.humidity,
                 Weather::BME280::TempUnit::TempUnit_Celsius,
                 Weather::BME280::PresUnit::PresUnit_hPa);
 
-        load.smog = Air::Smog.getCalibratedCO(load.temperature, load.humidity);
-        load.photoValue = Light::photoCell.getCurrentLux();
-        load.batteryLoad = Power::bat.voltage();
+        digitalWrite(pins::smogSwitch,HIGH);
+        delay(50);
+        Serial.println(Air::Smog.getRZero());
+        //payload.smog = Air::Smog.getCalibratedCO(payload.temperature, payload.humidity);
+        payload.smog = Air::Smog.getCO(resistance);
+        digitalWrite(pins::smogSwitch,LOW);
+
+        payload.photoValue = Light::photoCell.getCurrentLux();
+
+        payload.batteryLoad = Power::vRef.readVcc();
+
+        bool ok = Radio::Trasmitter.write(&payload, sizeof(payload));
+        //Serial.println(ok);
+        delay(80);
+        Radio::Trasmitter.powerDown();
+        delay(20);
 
         ///Serial debug stuff
         Serial.print(F("Battery: "));
-        Serial.print(load.batteryLoad);
+        Serial.print(payload.batteryLoad);
         Serial.print(F(" V"));
 
         Serial.print(F("\tSmog: "));
-        Serial.print(load.smog);
+        Serial.print(payload.smog);
         Serial.print(F(" gaz"));
 
         Serial.print(F("\tAmbient light: "));
-        Serial.print(load.photoValue);
+        Serial.print(payload.photoValue);
         Serial.print(F(" luxs"));
 
         Serial.print(F(" \tTemperature: "));
-        Serial.print(load.temperature);
+        Serial.print(payload.temperature);
         Serial.print(F(" °C"));
 
         Serial.print(F(" \tHumidity: "));
-        Serial.print(load.humidity);
+        Serial.print(payload.humidity);
         Serial.print(F(" % RH"));
 
         Serial.print(F("\tPressure: "));
-        Serial.print(load.pressure);
+        Serial.print(payload.pressure);
         Serial.println(F(" Pa"));
     }
 }

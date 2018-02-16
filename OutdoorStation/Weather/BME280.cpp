@@ -290,7 +290,7 @@ float BME280::CalculatePressure(int32_t raw, int32_t t_fine, PresUnit unit)
     var2 = (((int64_t) dig_P8) * pressure) >> 19;
     pressure = ((pressure + var1 + var2) >> 8) + (((int64_t) dig_P7) << 4);
 
-    final = ((uint32_t) pressure) / 256.0;
+    final = ((uint32_t) pressure) >> 8;
 
     // Conversion units courtesy of www.endmemo.com.
     switch (unit) {

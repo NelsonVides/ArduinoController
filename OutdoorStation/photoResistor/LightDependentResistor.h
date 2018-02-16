@@ -40,8 +40,8 @@ public:
     /*!
      * \enum ePhotoCellKind Photocell component
      */
-    enum ePhotoCellKind {
-        GL5516, GL5528, GL5537_1, GL5537_2, GL5539, GL5549
+    enum class ePhotoCellKind {
+        undef, GL5516, GL5528, GL5537_1, GL5537_2, GL5539, GL5549
     };
 
     /*!
@@ -52,7 +52,7 @@ public:
      * \parameter kind (ePhotoCellKind) Used photocell
      */
     LightDependentResistor(int pin, unsigned long other_resistor,
-            ePhotoCellKind kind = GL5528, bool onground = false);
+            ePhotoCellKind kind = ePhotoCellKind::GL5528, bool onground = false);
 
     /*!
      * \brief LightDependentResistor Initialize the light intensity getter class
