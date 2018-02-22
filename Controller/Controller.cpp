@@ -1,16 +1,19 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <SoftwareSerial.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
 #include <Time.h>
 #include <Chronos.h>
 
-#include "AirQuality/MQ135.h" //TODO: do something with all that floating point binary boilerplate! :(
+#include "AirQuality/MQ135.h"
 #include "LCD/LiquidCrystal_I2C.h"
 #include "Keypad/PushButton.h"
-#include "Weather/BME280I2C.h"
-//#include "Chronos/TimeProvider.h"
+#include "RelayControl/Relay.h"
+
 /* TODO's:
  *      going well: new thermometer with its other forecasting
+ *      do something with all that floating point binary boilerplate! :(
  *      next! connect the GSM and program it
  *      Calendars
  *      radio receiver and tinyBrd
@@ -27,6 +30,7 @@ namespace pins {
     constexpr uint8_t relayCon = 2;
 
     constexpr uint8_t lcdBckLight = 5;
+    constexpr uint8_t dallas = 49;
 
     constexpr uint8_t smogSensor = A2;
     constexpr uint8_t smogSwitch = 2;
@@ -36,32 +40,28 @@ namespace pins {
     constexpr uint8_t simRX = 7;
     constexpr uint8_t simTX = 8;
 
-    constexpr uint8_t radioCEN = 9;
-    constexpr uint8_t radioCS = 10;
-    constexpr uint8_t radioMOSI = 11;
-    constexpr uint8_t radioMISO = 12;
-    constexpr uint8_t radioSCK = 13;
-
+    constexpr uint8_t radioIRQ  = 19;
+    constexpr uint8_t radioCEN  = 48;
+    constexpr uint8_t radioMISO = 50;
+    constexpr uint8_t radioMOSI = 51;
+    constexpr uint8_t radioSCK  = 52;
+    constexpr uint8_t radioCS   = 53;
 }
 
 #include "LCD/Views.h"
 #include "KeypadCallbacks.h"
 
 namespace Weather {
-    Weather::BME280I2C::Settings SettingsBME(
-            Weather::BME280I2C::OSR::OSR_X1,
-            Weather::BME280I2C::OSR::OSR_X1,
-            Weather::BME280I2C::OSR::OSR_X1,
-            Weather::BME280I2C::Mode::Mode_Forced,
-            Weather::BME280I2C::StandbyTime::StandbyTime_1000ms,
-            Weather::BME280I2C::Filter::Filter_Off,
-            Weather::BME280I2C::SpiEnable::SpiEnable_False,
-            Weather::BME280I2C::I2CAddr_0x76);
-    static Weather::BME280I2C Therm(SettingsBME);
+    OneWire oneWire(pins::dallas);
+    DallasTemperature sensors(&oneWire);
 }
 
 namespace Air {
     MQ135 Smog = MQ135(pins::smogSensor);
+}
+
+namespace Heater {
+    Relay relay(pins::relayCon);
 }
 
 namespace timeMgmt {
@@ -86,16 +86,15 @@ namespace SIM {
 void setup()
 {
     Serial.begin(pins::SerialBaudRate);
+    delay(100);
 
     //SIM card
     SIM::sim.begin(9600);
-    delay(1000);
+    delay(100);
 
     ///WEATHER
-    Wire.begin();
-    while (!Weather::Therm.begin()) {
-        delay(1000);
-    }
+    Weather::sensors.begin();
+    delay(100);
 
     ///BUTTONS
     // When the button is first pressed, call the function onButtonPressed (further down the page)
@@ -113,7 +112,7 @@ void setup()
     buttonsMgmt::button4.onRelease(buttonsMgmt::onButtonReleased);
 
     // Relay
-    pinMode(pins::relayCon, OUTPUT);
+    Heater::relay.begin();
 
     ///SMOG
     Air::Smog.begin();
@@ -130,24 +129,14 @@ void setup()
 void loop()
 {
     if (timeMgmt::isTime()) {
-        const Weather::Measures res = Weather::Therm.read(
-                Weather::BME280::TempUnit::TempUnit_Celsius,
-                Weather::BME280::PresUnit::PresUnit_hPa);
-        Views::ViewWeather(res);
-
-        Serial.print(res.temperature);
-        Serial.print(F("°C"));
-        Serial.print(F("\t\tHumidity: "));
-        Serial.print(res.humidity);
-        Serial.print(F("% RH"));
-        Serial.print(F("\t\tPressure: "));
-        Serial.print(res.pressure);
-        Serial.println(F("Pa"));
+        Weather::sensors.requestTemperatures();
+        Serial.print("Temperature is: ");
+        Serial.println(Weather::sensors.getTempCByIndex(0)); // Why "byIndex"? You can have more than one IC on the same bus. 0 refers to the first IC on the wire
     }
 
     // Update those buttons
-    buttonsMgmt::button1.update();
-    buttonsMgmt::button2.update();
-    buttonsMgmt::button3.update();
-    buttonsMgmt::button4.update();
+    //buttonsMgmt::button1.update();
+    //buttonsMgmt::button2.update();
+    //buttonsMgmt::button3.update();
+    //buttonsMgmt::button4.update();
 }

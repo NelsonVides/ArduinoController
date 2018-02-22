@@ -1,2 +1,2 @@
 eclipse.preferences.version=1
-libraries=["Aspen SIM800",{"package"\:"arduino","platform"\:"avr","library"\:"SPI"},"Time",{"package"\:"arduino","platform"\:"avr","library"\:"Wire"},"Chronos",{"package"\:"arduino","platform"\:"avr","library"\:"SoftwareSerial"}]
+libraries=["Aspen SIM800",{"package"\:"arduino","platform"\:"avr","library"\:"SPI"},"Time",{"package"\:"arduino","platform"\:"avr","library"\:"Wire"},"DallasTemperature","OneWire","Chronos",{"package"\:"arduino","platform"\:"avr","library"\:"SoftwareSerial"}]
