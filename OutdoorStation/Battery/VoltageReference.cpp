@@ -20,6 +20,8 @@
 #include "Arduino.h"
 #include "VoltageReference.h"
 
+using namespace Power;
+
 void VoltageReference::begin(uint32_t calibration) {
 	VoltageReference::calibration = calibration;
 }
