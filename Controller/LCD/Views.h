@@ -9,13 +9,23 @@
 #define LCD_VIEWS_H_
 
 #include "LiquidCrystal_I2C.h"
+#include "../AirQuality/MQ135.h"
+#include "../RelayControl/Relay.h"
 
 namespace Views {
+
+    class theView{
+    private:
+        LiquidCrystal::LiquidCrystal_I2C &Lcd;
+    };
+
     LiquidCrystal::LiquidCrystal_I2C Lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3,
             LiquidCrystal::t_backlightPol::POSITIVE);
 
     void ViewIntro()
     {
+        pinMode(pins::lcdBckLight, OUTPUT);
+        analogWrite(pins::lcdBckLight, HIGH);
         Lcd.clear();
         Lcd.print(F("Arduino Rozana"));
         Lcd.setCursor(0, 1);

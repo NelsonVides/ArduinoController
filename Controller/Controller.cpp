@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <SoftwareSerial.h>
+#include <nRF24L01.h>
+#include <RF24.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include <Time.h>
@@ -60,6 +62,31 @@ namespace Air {
     MQ135 Smog = MQ135(pins::smogSensor);
 }
 
+namespace Radio {
+    constexpr uint64_t readingPipe = 0xB00B1E5000LL;
+    RF24 Receiver(pins::radioCEN, pins::radioCS);
+
+    class Payload {
+    public:
+        float pressure;
+        float temperature;
+        float humidity;
+        uint16_t photoValue;
+        uint16_t batteryLoad;
+    };
+
+    volatile Payload payload;
+    constexpr Payload* ptrload = &payload;
+
+    void savePayload()
+    {
+        while(Receiver.available()) {
+            Receiver.read(&payload, sizeof(Payload)); // @suppress("Invalid arguments")
+        }
+    }
+}
+
+
 namespace Heater {
     Relay relay(pins::relayCon);
 }
@@ -87,6 +114,7 @@ void setup()
 {
     Serial.begin(pins::SerialBaudRate);
     delay(100);
+    Serial.println(F("INIT of everything"));
 
     //SIM card
     SIM::sim.begin(9600);
@@ -96,13 +124,25 @@ void setup()
     Weather::sensors.begin();
     delay(100);
 
+    ///RADIO
+    Radio::Receiver.begin();
+    Radio::Receiver.setDataRate(RF24_250KBPS);
+    Radio::Receiver.setPALevel(RF24_PA_MIN);
+    Radio::Receiver.setChannel(0x58);
+    Radio::Receiver.enableAckPayload();
+    Radio::Receiver.setRetries(4,3);
+    Radio::Receiver.setAutoAck(true);
+    Radio::Receiver.openReadingPipe(1, Radio::readingPipe);
+    Radio::Receiver.maskIRQ(1,1,0); //Mask all interrupts except the receive interrupt
+    attachInterrupt(digitalPinToInterrupt(pins::radioIRQ), Radio::savePayload, FALLING);
+    Radio::Receiver.startListening();
+
     ///BUTTONS
     // When the button is first pressed, call the function onButtonPressed (further down the page)
     buttonsMgmt::button1.onPress(buttonsMgmt::onButtonPressed);
     buttonsMgmt::button2.onPress(buttonsMgmt::onButtonPressed);
     buttonsMgmt::button3.onPress(buttonsMgmt::onButtonPressed);
     buttonsMgmt::button4.onPress(buttonsMgmt::onButtonPressed);
-
     // Once the button has been held for 1 second (1000ms) call onButtonHeld. Call it again every 0.5s (500ms) until it is let go
     buttonsMgmt::button1.onHoldRepeat(1000, 500, buttonsMgmt::onButtonHeld);
     // When the button is released, call onButtonReleased
@@ -120,10 +160,8 @@ void setup()
     // LCD
     Views::Lcd.begin(16, 2, LiquidCrystal::LCD_5x8DOTS);
     Views::ViewIntro();
-    pinMode(pins::lcdBckLight, OUTPUT);
-    analogWrite(pins::lcdBckLight, HIGH);
 
-    Serial.println(F("INIT of everything"));
+    Serial.println(F("Setup done."));
 }
 
 void loop()
@@ -132,6 +170,21 @@ void loop()
         Weather::sensors.requestTemperatures();
         Serial.print("Temperature is: ");
         Serial.println(Weather::sensors.getTempCByIndex(0)); // Why "byIndex"? You can have more than one IC on the same bus. 0 refers to the first IC on the wire
+
+        Serial.print(Radio::payload.temperature);
+        Serial.print(F("°C"));
+        Serial.print(F("\tHumidity: "));
+        Serial.print(Radio::payload.humidity);
+        Serial.print(F("% RH"));
+        Serial.print(F("\tPressure: "));
+        Serial.print(Radio::payload.pressure);
+        Serial.print(F("Pa"));
+        Serial.print(F("\tLight: "));
+        Serial.print(Radio::payload.photoValue);
+        Serial.print(F("lux"));
+        Serial.print(F("\tBattery: "));
+        Serial.print(Radio::payload.batteryLoad);
+        Serial.println(F("V"));
     }
 
     // Update those buttons

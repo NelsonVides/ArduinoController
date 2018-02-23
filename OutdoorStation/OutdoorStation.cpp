@@ -76,12 +76,14 @@ void setup()
     #endif
     ///RADIO
     Radio::Trasmitter.begin();
-    Radio::Trasmitter.setAutoAck(true);
+    Radio::Trasmitter.setDataRate(RF24_250KBPS);
+    Radio::Trasmitter.setPALevel(RF24_PA_MIN);
+    Radio::Trasmitter.setChannel(0x58);
     Radio::Trasmitter.enableAckPayload();
     Radio::Trasmitter.setRetries(4,3);
+    Radio::Trasmitter.setAutoAck(true);
     Radio::Trasmitter.openWritingPipe(Radio::writingPipe);
     Radio::Trasmitter.stopListening();
-    Radio::Trasmitter.setPALevel(RF24_PA_MIN);
 
     ///WEATHER
     Wire.begin();
@@ -136,7 +138,10 @@ void loop()
         payload.photoValue = Light::photoCell.getCurrentLux();
         payload.batteryLoad = Power::vRef.readVcc();
 
-        bool ok = Radio::Trasmitter.write(&payload, sizeof(payload));//Serial.println(ok);
+        bool ok = Radio::Trasmitter.write(&payload, sizeof(payload));
+    #ifdef DEBUG_ON
+        Serial.println(ok ? "good" : "bad");
+    #endif
         delay(80);
         Radio::Trasmitter.powerDown();
         delay(20);
