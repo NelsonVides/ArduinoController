@@ -9,7 +9,7 @@
 #include "photoResistor/LightDependentResistor.h"
 #include "Battery/VoltageReference.h"
 
-#define DEBUG_ON
+//#define DEBUG_ON
 
 namespace pins {
     constexpr auto SerialBaudRate = 115200;
@@ -111,7 +111,7 @@ public:
 
 inline void sleepMinutes(uint8_t min)
 {
-    for (int i = 0; i < ((uint8_t)(7.5 * min)); i++) {
+    for (uint8_t i = 0; i < (7 * min); ++i) {
         LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
     }
 }
@@ -120,7 +120,7 @@ inline void sleepMinutes(uint8_t min)
 void loop()
 {
     #ifndef DEBUG_ON
-        sleepMinutes(15);
+        sleepMinutes(1);
     #endif
 
     #ifdef DEBUG_ON

@@ -25,7 +25,7 @@ namespace Views {
     void ViewIntro()
     {
         pinMode(pins::lcdBckLight, OUTPUT);
-        analogWrite(pins::lcdBckLight, HIGH);
+        analogWrite(pins::lcdBckLight, 64);
         Lcd.clear();
         Lcd.print(F("Arduino Rozana"));
         Lcd.setCursor(0, 1);

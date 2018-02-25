@@ -14,11 +14,12 @@
 #include "RelayControl/Relay.h"
 
 /* TODO's:
- *      going well: new thermometer with its other forecasting
- *      do something with all that floating point binary boilerplate! :(
+ *      on the radio, implement the date of the last update
+ *      check for battery levels of the OutdoorStation
  *      next! connect the GSM and program it
+ *      do something with all that floating point binary boilerplate! :(
  *      Calendars
- *      radio receiver and tinyBrd
+ *      the view: explore UI patterns
  */
 
 namespace pins {
@@ -28,19 +29,30 @@ namespace pins {
     constexpr uint8_t btn2 = A1;
     constexpr uint8_t btn3 = A2;
     constexpr uint8_t btn4 = A3;
+    constexpr uint8_t smogSensor = A4; //TODO: https://hackaday.io/project/3475-sniffing-trinket/log/12363-mq135-arduino-library
+    constexpr uint8_t photoSensor = A5;
 
-    constexpr uint8_t relayCon = 2;
+    constexpr uint8_t lcdBckLight = 2;
 
-    constexpr uint8_t lcdBckLight = 5;
+    constexpr uint8_t RGBOneRed     = 5;
+    constexpr uint8_t RGBOneGreen   = 6;
+    constexpr uint8_t RGBOneBlue    = 7;
+    constexpr uint8_t RGBTwoRed     = 8;
+    constexpr uint8_t RGBTwoGreen   = 9;
+    constexpr uint8_t RGBTwoBlue    = 10;
+    constexpr uint8_t RGBThreeRed   = 11;
+    constexpr uint8_t RGBThreeGreen = 12;
+    constexpr uint8_t RGBThreeBlue  = 13;
+
+    constexpr uint8_t pushInterrupt = 18;
+
+    constexpr uint8_t relayCon = 44;
+
     constexpr uint8_t dallas = 49;
 
-    constexpr uint8_t smogSensor = A2;
-    constexpr uint8_t smogSwitch = 2;
-    //TODO: https://hackaday.io/project/3475-sniffing-trinket/log/12363-mq135-arduino-library
-
-    constexpr uint8_t simRST = 6;
-    constexpr uint8_t simRX = 7;
-    constexpr uint8_t simTX = 8;
+    constexpr uint8_t simTX = 14;
+    constexpr uint8_t simRX = 15;
+    constexpr uint8_t simRST = 46;
 
     constexpr uint8_t radioIRQ  = 19;
     constexpr uint8_t radioCEN  = 48;
@@ -76,13 +88,14 @@ namespace Radio {
     };
 
     volatile Payload payload;
-    constexpr Payload* ptrload = &payload;
+    volatile bool newPayload;
 
     void savePayload()
     {
         while(Receiver.available()) {
             Receiver.read(&payload, sizeof(Payload)); // @suppress("Invalid arguments")
         }
+        newPayload = true;
     }
 }
 
@@ -92,7 +105,7 @@ namespace Heater {
 }
 
 namespace timeMgmt {
-    unsigned long interval = 1000;
+    unsigned long interval = 10000;
     bool isTime()
     {
         static unsigned long _previousMillis;
@@ -170,7 +183,8 @@ void loop()
         Weather::sensors.requestTemperatures();
         Serial.print("Temperature is: ");
         Serial.println(Weather::sensors.getTempCByIndex(0)); // Why "byIndex"? You can have more than one IC on the same bus. 0 refers to the first IC on the wire
-
+    }
+    if (Radio::newPayload) {
         Serial.print(Radio::payload.temperature);
         Serial.print(F("°C"));
         Serial.print(F("\tHumidity: "));
@@ -185,6 +199,7 @@ void loop()
         Serial.print(F("\tBattery: "));
         Serial.print(Radio::payload.batteryLoad);
         Serial.println(F("V"));
+        Radio::newPayload = false;
     }
 
     // Update those buttons
